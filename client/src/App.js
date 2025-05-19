@@ -276,15 +276,15 @@ const PointsDisplay = ({ characters, markedCells, onRefreshClick }) => {
   const bingoPoints = checkForBingos();
   const totalPoints = basePoints + bingoPoints;
 
-  // Calculate the percentage for the meter (0-350 points)
-  const MAX_POINTS = 350;
+  // Calculate the percentage for the meter (0-500 points)
+  const MAX_POINTS = 400;
   const fillPercentage = Math.min((totalPoints / MAX_POINTS) * 100, 100);
 
   // Milestone definitions
   const milestones = [
-    { points: 150, reward: "Champagne Toast in LA Live" },
-    { points: 250, reward: "Mystery prize" },
-    { points: 350, reward: "Yakitori on the beach!" }
+    { points: 150, reward: "Toast in L.A. Live!" },
+    { points: 250, reward: "Mystery prize!" },
+    { points: 350, reward: "Yakitori!" }
   ];
 
   return (
@@ -295,6 +295,11 @@ const PointsDisplay = ({ characters, markedCells, onRefreshClick }) => {
             className="points-meter-fill"
             style={{ width: `${fillPercentage}%` }}
           ></div>
+
+          {/* Add the progress text with negative coloring effect */}
+          <div className="progress-text">
+            GROUP POINTS
+          </div>
 
           {/* Render milestones */}
           {milestones.map((milestone, index) => (
@@ -312,13 +317,15 @@ const PointsDisplay = ({ characters, markedCells, onRefreshClick }) => {
         </div>
       </div>
 
-      <div className="points-display">
-        <div className="score-label">Score</div>
-        <div className="score-value">{totalPoints}</div>
+      <div className="controls-wrapper">
+        <div className="points-display">
+          <div className="score-label">Score</div>
+          <div className="score-value">{totalPoints}</div>
+        </div>
+        <button className="refresh-button" onClick={onRefreshClick} title="Refresh Board">
+          ↻
+        </button>
       </div>
-      <button className="refresh-button" onClick={onRefreshClick} title="Refresh Board">
-        ↻
-      </button>
     </div>
   );
 };
@@ -514,6 +521,44 @@ const BingoBoard = () => {
   );
 };
 
+// Leaderboard component
+const Leaderboard = () => {
+  // Dummy data for the leaderboard
+  const leaderboardData = [
+    { name: "Samb", score: 320 },
+    { name: "Law", score: 280 },
+    { name: "Mayjay", score: 350 },
+    { name: "Bong", score: 210 }
+  ];
+
+  // Sort data by score in descending order
+  const sortedData = [...leaderboardData].sort((a, b) => b.score - a.score);
+
+  // Find the maximum score for scaling
+  const maxScore = Math.max(...sortedData.map(user => user.score));
+
+  return (
+    <div className="leaderboard-section">
+      <h2>Leaderboard</h2>
+      <div className="leaderboard-container">
+        {sortedData.map((user, index) => (
+          <div key={index} className="leaderboard-entry">
+            <div className="user-rank">{index + 1}</div>
+            <div className="user-name">{user.name}</div>
+            <div className="score-bar-container">
+              <div
+                className="score-bar"
+                style={{ width: `${(user.score / maxScore) * 100}%` }}
+              ></div>
+              <span className="score-value">{user.score}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Main App component
 const App = () => {
   return (
@@ -525,6 +570,7 @@ const App = () => {
         <p>Thank you for competing in Official 2025 Bimbo Hunt! Please read our <a href="#how-to-play">#how to play</a> and <a href="#rules">#rules</a> before starting your game.</p>
       </header>
       <BingoBoard />
+      <Leaderboard />
       <div id="how-to-play" className="rules-section">
         <h2>How to Play</h2>
         <p>Ready to start hunting? Here's what to do:</p>
