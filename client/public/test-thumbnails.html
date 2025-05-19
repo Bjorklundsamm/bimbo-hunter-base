@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thumbnail Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .thumbnails {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .thumbnail {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        .thumbnail img {
+            max-width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        .thumbnail p {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Thumbnail Test</h1>
+    <div class="thumbnails" id="thumbnails-container">
+        <!-- Thumbnails will be added here dynamically -->
+    </div>
+
+    <script>
+        // List of character names
+        const characters = [
+            'Frieren',
+            'Momo Ayase',
+            'Agatsuma Zenitsu',
+            'Anges Tachyon',
+            'Anya Forger',
+            'Emilia',
+            'Esil',
+            'Fami',
+            'Jinshi & Maomao',
+            'Joseph Joestar',
+            'Kazuho Haneyama',
+            'Nanakusa Nazuna',
+            'Narumi Gen',
+            'Nichole and Jecka',
+            'Orihime Inoue',
+            'Reze',
+            'Sebastian Michaelis',
+            'Shadow the Hedgehog',
+            'Shikanoko Noko',
+            'Shinmon Benimaru',
+            'Suou Tamaki',
+            'Sylus',
+            'Tsunade',
+            'Alex Louis Armstrong',
+            'Asakura Shin & Lu Shaotang',
+            'Brazilian Miku',
+            'Gemma',
+            'Hayato Suou',
+            'Kabru',
+            'Khun Aguero Agnis',
+            'Nice',
+            'Sensei',
+            'Tamaki Kotatsu',
+            'Vegapunk 2 Lilith',
+            'Yoko Littner',
+            'Biscuit Krueger',
+            'Dokugamine Riruku',
+            'Otoha & Lilisa',
+            'Ramlethal Valentine',
+            'Seras Victoria',
+            'Shiki Ryougi',
+            'Tatsumaki',
+            'Tomo Aizawa',
+            'Tsumugi Kotobuki',
+            'Yae Miko',
+            'Yotsuba Nakano',
+            'Illumi Zoldyck',
+            'Kessoku Band',
+            'Klaus Von Reinhardt',
+            'Midna',
+            'Sinbad'
+        ];
+
+        // Get the container
+        const container = document.getElementById('thumbnails-container');
+
+        // Handle special cases for characters with special characters in their names
+        const specialCases = {
+            'Jinshi & Maomao': 'Jinshi & Maomao',
+            'Asakura Shin & Lu Shaotang': 'Asakura Shin & Lu Shaotang',
+            'Nichole and Jecka': 'Nichole and Jecka',
+            'Otoha & Lilisa': 'Otoha & Lilisa',
+            'Kessoku Band': 'Kessoku Band - thumbnail',
+            'Klaus Von Reinhardt': 'Klaus Von Reinhardt - thumbnail',
+            'Midna': 'Midna - thumbnail',
+            'Sinbad': 'Sinbad - thumnail'  // Note the typo in the original filename
+        };
+
+        // Create a thumbnail element for each character
+        characters.forEach(character => {
+            const thumbnailDiv = document.createElement('div');
+            thumbnailDiv.className = 'thumbnail';
+
+            const img = document.createElement('img');
+            // Use the special case if it exists, otherwise use the character name
+            const filename = specialCases[character] || character;
+            img.src = `/thumbnails/${filename}.png`;
+            img.alt = character;
+            img.onerror = function() {
+                this.src = 'https://via.placeholder.com/150?text=Missing';
+            };
+
+            const p = document.createElement('p');
+            p.textContent = character;
+
+            thumbnailDiv.appendChild(img);
+            thumbnailDiv.appendChild(p);
+            container.appendChild(thumbnailDiv);
+        });
+    </script>
+</body>
+</html>

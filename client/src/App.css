@@ -1,13 +1,16 @@
 /* App Container */
 .app-container {
   min-height: 100vh;
+  width: 100%;
   background: linear-gradient(to bottom right, #2c3e50, #000000);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 1rem;
+  justify-content: flex-start; /* Start from the top to ensure content is visible */
+  padding: min(5vw, 1rem); /* Responsive padding */
+  box-sizing: border-box; /* Include padding in width calculation */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 /* App Header */
@@ -16,12 +19,16 @@
   text-align: center;
 }
 
-.app-header h1 {
-  font-size: 3rem;
-  font-weight: bold;
-  color: white;
+.logo-container {
+  display: flex;
+  justify-content: center;
   margin-bottom: 0.5rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.title-logo {
+  max-width: 80%;
+  height: auto;
+  margin-bottom: 0.5rem;
 }
 
 .app-header p {
@@ -45,52 +52,388 @@
 .bingo-board {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 0.5rem;
-  padding: 1rem;
-  background-color: #f3f4f6;
+  gap: min(1.2vw, 0.5rem); /* Increased gap to prevent border overlap */
+  padding: min(1vw, 0.5rem); /* Dynamic padding that scales with viewport */
+  background-color: rgba(243, 244, 246, 0.1); /* More transparent background */
   border-radius: 0.5rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  width: min(95vw, 95%); /* Use viewport width but cap at 95% */
+  aspect-ratio: 1/1; /* Maintain square aspect ratio */
+  max-height: 95vh; /* Ensure it doesn't exceed viewport height */
+  max-width: 95vh; /* Keep it square by matching max-height */
 }
 
 /* Bingo Square */
 .bingo-square {
-  width: 4rem;
-  height: 4rem;
-  border: 1px solid #d1d5db;
+  width: 95%; /* Slightly reduced from 100% to create space between squares */
+  height: 95%; /* Slightly reduced from 100% to create space between squares */
+  border: min(0.5vw, 3px) solid; /* Dynamic border that scales with viewport */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
-  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  border-radius: 0.375rem;
+  border-radius: 0; /* Removed curved corners */
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  background-color: white;
-  color: #1f2937;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  aspect-ratio: 1/1; /* Ensure square aspect ratio */
+  margin: auto; /* Center the square in its grid cell */
+}
+
+/* Character info styles removed as they're no longer needed */
+
+.thumbnail-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* Ensure images don't overflow */
+  cursor: pointer;
+}
+
+.character-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Cover the container while maintaining aspect ratio */
+  object-position: center; /* Center the image */
+  max-width: 100%; /* Ensure image doesn't exceed container width */
+  max-height: 100%; /* Ensure image doesn't exceed container height */
+  transition: transform 0.2s ease;
+}
+
+.thumbnail-container:hover .character-thumbnail {
+  transform: scale(1.05);
+}
+
+.thumbnail-container:active .character-thumbnail {
+  transform: scale(0.95);
 }
 
 .bingo-square:hover {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transform: scale(1.05);
+  transform: scale(1.01); /* Further reduced scale effect to avoid overlap */
+  z-index: 10;
 }
 
 .bingo-square.marked {
-  background-color: #ec4899;
-  color: white;
-  transform: scale(1.05);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+/* Claimed overlay with translucent black background and white check mark */
+.bingo-square.marked::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.45); /* 45% opacity black overlay */
+  z-index: 5; /* Lower z-index to ensure it doesn't block clicks */
+  pointer-events: none; /* Ensure clicks pass through to the thumbnail */
+}
+
+.bingo-square.marked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(255, 255, 255, 0.7); /* Semi-transparent white checkmark */
+  font-size: min(40%, 2rem); /* Responsive font size */
+  font-weight: bold;
+  z-index: 6; /* Above the overlay but still low enough to not block clicks */
+  pointer-events: none; /* Ensure clicks pass through to the thumbnail */
+}
+
+/* Special styling for the FREE square */
+.bingo-square.free.marked::after {
+  content: 'FREE';
+  font-size: min(60%, 3rem); /* Smaller but still larger than normal text */
+}
+
+/* Points and Controls Container */
+.points-controls-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: min(4vh, 1.5rem);
+  width: min(95%, 800px); /* Use 95% of container width but cap at 800px */
+  position: relative;
+}
+
+/* Points Display */
+.points-display {
+  width: 100px;
+  height: 100px;
+  padding: min(2vw, 0.8rem);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: white;
+  box-sizing: border-box; /* Include padding in width calculation */
+  text-align: center;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.score-label {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  margin-bottom: 0.3rem;
+}
+
+.score-value {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Points Meter */
+.points-meter-container {
+  position: absolute;
+  left: 0;
+  height: 100px;
+  width: calc(100% - 170px); /* Leave space for score and refresh button */
+  display: flex;
+  align-items: center;
+}
+
+.points-meter {
+  width: 100%;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  position: relative;
+}
+
+.points-meter-fill {
+  height: 100%;
+  background: linear-gradient(to right, #4CAF50, #FFC107, #F44336);
+  border-radius: 15px;
+  transition: width 0.5s ease-out;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.milestone {
+  position: absolute;
+  top: -10px;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 50px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.milestone::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 50px;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.milestone::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  z-index: 11;
+}
+
+.milestone:hover::after {
+  transform: translateX(-50%) scale(1.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+.milestone-tooltip {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2c3e50;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  width: max-content;
+  max-width: 200px;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 20;
+}
+
+.milestone-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: #2c3e50 transparent transparent transparent;
+}
+
+.milestone:hover .milestone-tooltip {
+  opacity: 1;
+  visibility: visible;
+  bottom: 65px;
+}
+
+.milestone-value {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  z-index: 12;
+  pointer-events: none;
+}
+
+/* Refresh Button */
+.refresh-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.refresh-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: rotate(30deg);
+}
+
+.refresh-button:active {
+  transform: rotate(60deg) scale(0.95);
+}
+
+/* Confirmation Modal */
+.confirmation-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.confirmation-modal {
+  background-color: #2c3e50;
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: min(90%, 400px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  color: white;
+  animation: modal-appear 0.3s ease-out;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.confirmation-modal h3 {
+  margin-top: 0;
+  color: #f44336;
+  font-size: 1.5rem;
+}
+
+.confirmation-modal p {
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.confirmation-modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.confirmation-modal-buttons button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancel-button {
+  background-color: #78909c;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #607d8b;
+}
+
+.confirm-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.confirm-button:hover {
+  background-color: #d32f2f;
 }
 
 /* Rules Section */
 .rules-section {
-  margin-top: 2rem;
-  padding: 1.5rem;
+  margin-top: min(4vh, 1.5rem);
+  padding: min(5vw, 1.5rem);
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 0.5rem;
-  width: 80%;
-  max-width: 800px;
+  width: min(95%, 800px); /* Use 95% of container width but cap at 800px */
   color: white;
+  box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .rules-section h2 {
@@ -114,25 +457,433 @@
   font-size: 0.875rem;
 }
 
-/* Loading Message */
-.loading-message {
-  text-align: center;
-  padding: 1rem;
+/* Portrait Overlay */
+.portrait-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(0px);
+  transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
 }
 
-/* Responsive Adjustments */
-@media (min-width: 768px) {
-  .bingo-square {
-    width: 5rem;
-    height: 5rem;
-    font-size: 1.5rem;
+.portrait-overlay.visible {
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+}
+
+.portrait-container {
+  position: relative;
+  max-width: 90%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: scale(0.2);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
+
+.portrait-container.visible {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.character-portrait {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.close-button {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 36px;
+  height: 36px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  z-index: 1001;
+}
+
+.close-button:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.portrait-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.claim-button {
+  padding: 10px 30px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.claim-button:hover {
+  background-color: #45a049;
+}
+
+/* Unclaim button styling */
+.claim-button.unclaim {
+  background-color: #F44336; /* Red for unclaim */
+}
+
+.claim-button.unclaim:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+}
+
+.details-button {
+  padding: 10px 30px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.details-button:hover {
+  background-color: #0b7dda;
+}
+
+.character-details-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: 4px;
+  overflow: auto;
+  cursor: pointer; /* Indicate it's clickable */
+}
+
+.character-details-content {
+  color: white;
+  padding: 20px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.5); /* Slightly different background to distinguish from overlay */
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  cursor: default; /* Reset cursor for content area */
+}
+
+.character-details-content p {
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.character-details-content p strong {
+  color: #81d4fa; /* Light blue for headers */
+  font-size: 1.1em;
+}
+
+/* Mobile adjustments for portrait overlay */
+@media (max-width: 768px) {
+  .portrait-container {
+    max-width: 95%;
+    transform: scale(0.1); /* Smaller initial scale on mobile for more dramatic effect */
+  }
+
+  .portrait-container.visible {
+    transform: scale(1);
+  }
+
+  .close-button {
+    top: -30px;
+    right: -10px;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+  }
+
+  .portrait-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .claim-button, .details-button {
+    padding: 8px 24px;
+    font-size: 16px;
+    width: 100%;
+  }
+
+  .character-details-content {
+    padding: 15px;
+    font-size: 14px;
+  }
+
+  .character-details-content p {
+    margin-bottom: 10px;
+  }
+
+  /* Faster transitions on mobile */
+  .portrait-overlay {
+    transition: background-color 0.25s ease, backdrop-filter 0.25s ease;
+  }
+
+  .portrait-container {
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
   }
 }
 
-@media (min-width: 1024px) {
+/* Loading and Error Messages */
+.loading-message, .error-message {
+  text-align: center;
+  padding: 1rem;
+  margin: 1rem;
+  border-radius: 0.5rem;
+}
+
+.loading-message {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.error-message {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #F44336;
+  border: 1px solid #F44336;
+}
+
+/* Responsive Adjustments */
+/* Small mobile devices in portrait mode */
+@media (max-width: 320px) {
+  .bingo-board {
+    gap: 0.3rem; /* Increased minimal gap for very small screens */
+    padding: 0.2rem;
+  }
+
   .bingo-square {
-    width: 6rem;
-    height: 6rem;
-    font-size: 1.75rem;
+    width: 94%; /* Slightly smaller squares on very small screens */
+    height: 94%;
+  }
+
+  .bingo-square.marked::after {
+    font-size: 1.5rem; /* Smaller font size for very small screens */
+    color: rgba(255, 255, 255, 0.7); /* Maintain semi-transparent white */
+  }
+
+  .bingo-square.free.marked::after {
+    font-size: 2rem; /* Smaller size for very small screens */
+  }
+}
+
+/* Mobile devices in portrait mode */
+@media (orientation: portrait) {
+  .title-logo {
+    max-width: 90%; /* Slightly larger on mobile */
+  }
+
+  .app-header p {
+    font-size: 1rem;
+  }
+
+  .points-controls-container {
+    margin-top: 1.5rem;
+    gap: 0.5rem;
+  }
+
+  .points-display {
+    width: 90px;
+    height: 90px;
+    padding: 0.8rem;
+  }
+
+  .score-label {
+    font-size: 0.8rem;
+  }
+
+  .score-value {
+    font-size: 1.8rem;
+  }
+
+  .refresh-button {
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+  }
+
+  .points-meter-container {
+    height: 90px;
+    width: calc(100% - 150px);
+  }
+
+  .points-meter {
+    height: 25px;
+  }
+
+  .milestone::before {
+    height: 40px;
+  }
+
+  .milestone-value {
+    font-size: 0.7rem;
+  }
+
+  .rules-section {
+    margin-top: 1.5rem;
+    padding: 1rem;
+  }
+}
+
+/* Mobile devices in landscape mode */
+@media (orientation: landscape) and (max-height: 500px) {
+  .app-container {
+    padding: 0.5rem;
+  }
+
+  .app-header {
+    margin-bottom: 1rem;
+  }
+
+  .title-logo {
+    max-width: 60%; /* Smaller in landscape to save vertical space */
+  }
+
+  .bingo-board {
+    max-height: 80vh; /* Ensure it fits in landscape mode */
+  }
+
+  .points-controls-container {
+    margin-top: 1rem;
+    gap: 0.5rem;
+  }
+
+  .points-display {
+    width: 80px;
+    height: 80px;
+    padding: 0.6rem;
+  }
+
+  .score-label {
+    font-size: 0.7rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .score-value {
+    font-size: 1.6rem;
+  }
+
+  .refresh-button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .points-meter-container {
+    height: 80px;
+    width: calc(100% - 135px);
+  }
+
+  .points-meter {
+    height: 20px;
+  }
+
+  .milestone::before {
+    height: 35px;
+  }
+
+  .milestone::after {
+    width: 16px;
+    height: 16px;
+  }
+
+  .milestone-value {
+    font-size: 0.65rem;
+    bottom: -20px;
+  }
+
+  .milestone-tooltip {
+    max-width: 150px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+
+  .rules-section {
+    margin-top: 1rem;
+    padding: 0.8rem;
+  }
+}
+
+/* Tablets and medium-sized screens */
+@media (min-width: 768px) and (min-height: 768px) {
+  .bingo-board {
+    gap: min(1.5vw, 0.6rem); /* Increased gap for better visibility on tablets */
+    padding: min(1.5vw, 0.6rem);
+  }
+
+  .bingo-square {
+    width: 95%;
+    height: 95%;
+    border: min(0.6vw, 4px) solid;
+  }
+
+  .bingo-square.marked::after {
+    font-size: 2.5rem; /* Larger font size for tablets */
+    color: rgba(255, 255, 255, 0.7); /* Maintain semi-transparent white */
+  }
+
+  .bingo-square.free.marked::after {
+    font-size: 2.5rem; /* Larger but still fits on tablets */
+  }
+}
+
+/* Large screens and desktops */
+@media (min-width: 1200px) {
+  .bingo-board {
+    max-width: 80vh; /* Slightly smaller on large screens for better aesthetics */
+    max-height: 80vh;
+    gap: 0.7rem; /* Fixed gap size for large screens */
+  }
+
+  .bingo-square {
+    width: 95%;
+    height: 95%;
+    border: 4px solid;
+  }
+
+  .bingo-square.marked::after {
+    font-size: 3rem; /* Larger font size for desktops */
+    color: rgba(255, 255, 255, 0.7); /* Maintain semi-transparent white */
+  }
+
+  .bingo-square.free.marked::after {
+    font-size: 3rem; /* Larger but still fits on desktops */
   }
 }

@@ -1,0 +1,16 @@
+{
+  "name": "bimbo-hunter",
+  "version": "1.0.0",
+  "description": "Bimbo Hunter Game",
+  "main": "app.py",
+  "scripts": {
+    "start-backend": "python app.py",
+    "start-frontend": "cd client && npm start",
+    "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "author": "",
+  "license": "ISC"
+}

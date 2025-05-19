@@ -2,14 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link id="dynamic-favicon" rel="icon" href="" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="Bimbo Hunter - Official 2025 Bimbo Hunt Game"
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!-- No apple-touch-icon -->
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -24,7 +24,7 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+    <title>Bimbo Hunter</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -39,5 +39,33 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+
+    <!-- Script to set a random thumbnail as favicon -->
+    <script>
+      (function() {
+        // List of thumbnail images (a subset of available thumbnails)
+        const thumbnails = [
+          '/thumbnails/Frieren.png',
+          '/thumbnails/Momo Ayase.png',
+          '/thumbnails/Biscuit Krueger.png',
+          '/thumbnails/Ranni the Witch.png',
+          '/thumbnails/Yoko Littner.png',
+          '/thumbnails/Emilia.png',
+          '/thumbnails/Anya Forger.png',
+          '/thumbnails/Sailor Mars.png',
+          '/thumbnails/Reze.png',
+          '/thumbnails/Nanakusa Nazuna.png'
+        ];
+
+        // Select a random thumbnail
+        const randomThumbnail = thumbnails[Math.floor(Math.random() * thumbnails.length)];
+
+        // Set it as the favicon
+        const faviconLink = document.getElementById('dynamic-favicon');
+        if (faviconLink) {
+          faviconLink.href = randomThumbnail;
+        }
+      })();
+    </script>
   </body>
 </html>
