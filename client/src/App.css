@@ -13,6 +13,288 @@
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
+/* Authentication Styles */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  width: 100%;
+  padding: 2rem 0;
+}
+
+.auth-form-container {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.auth-form-container h2 {
+  color: white;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-error {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #F44336;
+  border: 1px solid #F44336;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: white;
+  font-weight: bold;
+}
+
+.form-group input {
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #4fc3f7;
+  box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.3);
+}
+
+.auth-button {
+  padding: 0.75rem;
+  background-color: #4fc3f7;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 0.5rem;
+}
+
+.auth-button:hover {
+  background-color: #29b6f6;
+}
+
+.auth-button:disabled {
+  background-color: #b0bec5;
+  cursor: not-allowed;
+}
+
+.auth-toggle {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  color: #4fc3f7;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.toggle-button:hover {
+  color: #29b6f6;
+}
+
+.toggle-button:disabled {
+  color: #b0bec5;
+  cursor: not-allowed;
+}
+
+/* Dashboard Styles */
+.dashboard-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 1rem;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+  color: white;
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.logout-button {
+  background-color: rgba(244, 67, 54, 0.2);
+  color: white;
+  border: 1px solid rgba(244, 67, 54, 0.5);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: rgba(244, 67, 54, 0.3);
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.action-button {
+  flex: 1;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.action-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.users-section {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.users-section h2 {
+  color: white;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.user-name {
+  color: white;
+  font-weight: bold;
+}
+
+.view-board-button {
+  background-color: rgba(79, 195, 247, 0.2);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.view-board-button:hover {
+  background-color: rgba(79, 195, 247, 0.3);
+}
+
+.no-users-message {
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Board Viewer Styles */
+.board-viewer-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.board-viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.board-viewer-header h1 {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 2.2rem;
+  margin: 0;
+}
+
+/* Your Board text styling */
+.your-board-title {
+  text-decoration: underline;
+  opacity: 0.7; /* More transparent */
+}
+
+.back-button {
+  background-color: rgba(79, 195, 247, 0.2);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin: 1.5rem auto;
+  display: block;
+  width: fit-content;
+}
+
+.back-button:hover {
+  background-color: rgba(79, 195, 247, 0.3);
+}
+
+/* Read-only styles */
+.bingo-square.read-only {
+  cursor: default;
+}
+
+.bingo-square.read-only:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 /* App Header */
 .app-header {
   margin-bottom: 2rem;
@@ -143,16 +425,18 @@
   left: 50%;
   transform: translate(-50%, -50%);
   color: rgba(255, 255, 255, 0.7); /* Semi-transparent white checkmark */
-  font-size: min(60%, 2rem); /* Responsive font size */
+  font-size: min(60%, 1.8rem); /* Increased font size */
   font-weight: bold;
   z-index: 6; /* Above the overlay but still low enough to not block clicks */
   pointer-events: none; /* Ensure clicks pass through to the thumbnail */
+  text-align: center; /* Ensure text is centered */
+  width: 100%; /* Take full width of container */
 }
 
 /* Special styling for the FREE square */
 .bingo-square.free.marked::after {
   content: 'FREE';
-  font-size: min(60%, 3rem); /* Smaller but still larger than normal text */
+  font-size: min(70%, 3.5rem); /* Increased font size */
 }
 
 /* Points and Controls Container */
@@ -356,7 +640,7 @@
 }
 
 /* Confirmation Modal */
-.confirmation-modal-overlay {
+.confirmation-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -370,7 +654,7 @@
   backdrop-filter: blur(5px);
 }
 
-.confirmation-modal {
+.confirmation-dialog {
   background-color: #2c3e50;
   border-radius: 8px;
   padding: 1.5rem;
@@ -392,24 +676,24 @@
   }
 }
 
-.confirmation-modal h3 {
+.confirmation-dialog h3 {
   margin-top: 0;
   color: #f44336;
   font-size: 1.5rem;
 }
 
-.confirmation-modal p {
+.confirmation-dialog p {
   margin-bottom: 1.5rem;
   line-height: 1.5;
 }
 
-.confirmation-modal-buttons {
+.confirmation-buttons {
   display: flex;
   justify-content: center;
   gap: 1rem;
 }
 
-.confirmation-modal-buttons button {
+.confirmation-buttons button {
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 4px;
@@ -503,6 +787,12 @@
   overflow: hidden;
   display: flex;
   align-items: center;
+  cursor: pointer; /* Make it clickable */
+  transition: background-color 0.2s ease;
+}
+
+.score-bar-container:hover {
+  background-color: rgba(0, 0, 0, 0.4); /* Darker on hover */
 }
 
 .score-bar {
@@ -542,6 +832,53 @@
 .rules-section p {
   font-size: 1rem;
   line-height: 1.6;
+}
+
+/* Dashboard Info Sections */
+.dashboard-info-sections {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rules-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header Links */
+.header-links {
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+.header-links a {
+  color: #61dafb;
+  text-decoration: none;
+  margin: 0 0.3rem;
+  transition: color 0.2s ease;
+}
+
+.header-links a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+/* Standalone Rules Page */
+.standalone-rules-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  width: 100%;
+  padding: 2rem 0;
 }
 
 /* App Footer */
@@ -790,12 +1127,12 @@
   }
 
   .bingo-square.marked::after {
-    font-size: 1.5rem; /* Smaller font size for very small screens */
+    font-size: 1.2rem; /* Slightly larger font size for very small screens */
     color: rgba(255, 255, 255, 0.7); /* Maintain semi-transparent white */
   }
 
   .bingo-square.free.marked::after {
-    font-size: 2rem; /* Smaller size for very small screens */
+    font-size: 2.2rem; /* Slightly larger size for very small screens */
   }
 }
 
@@ -1010,12 +1347,12 @@
   }
 
   .bingo-square.marked::after {
-    font-size: 2.5rem; /* Larger font size for tablets */
+    font-size: 2rem; /* Increased font size for tablets */
     color: rgba(255, 255, 255, 0.7); /* Maintain semi-transparent white */
   }
 
   .bingo-square.free.marked::after {
-    font-size: 2.5rem; /* Larger but still fits on tablets */
+    font-size: 2.8rem; /* Increased size for tablets */
   }
 }
 
@@ -1034,11 +1371,11 @@
   }
 
   .bingo-square.marked::after {
-    font-size: 3rem; /* Larger font size for desktops */
+    font-size: 2.2rem; /* Increased font size for desktops */
     color: rgba(255, 255, 255, 0.7); /* Maintain semi-transparent white */
   }
 
   .bingo-square.free.marked::after {
-    font-size: 3rem; /* Larger but still fits on desktops */
+    font-size: 3.5rem; /* Increased size for desktops */
   }
 }
