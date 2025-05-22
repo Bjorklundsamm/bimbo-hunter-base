@@ -1,6 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 
+// Import components
+import { UserProvider, useUser } from './components/Auth/UserContext';
+import Login from './components/Auth/Login';
+import UserDashboard from './components/Dashboard/UserDashboard';
+import BoardViewer from './components/Board/BoardViewer';
+
+// Protected Route component
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useUser();
+
+  // If still loading, show loading indicator
 // Portrait Overlay component
 const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaimed }) => {
   // Get the portrait URL from the portrait path
@@ -505,104 +517,22 @@ const BingoBoard = () => {
   };
 
   if (loading) {
-    return <div className="loading-message">Loading board...</div>;
+    return <div className="loading-message">Loading...</div>;
   }
 
-  if (error) {
-    return <div className="error-message">Error: {error}</div>;
+  // If not logged in, redirect to login page
+  if (!user) {
+    return <Navigate to="/" replace />;
   }
 
-  return (
-    <>
-      <div className="bingo-board">
-        {characters.map((character, index) => (
-          <BingoSquare
-            key={index}
-            index={index}
-            character={character}
-            isMarked={markedCells.has(index)}
-            onClick={() => handleSquareClick(index)}
-            onPortraitClick={handlePortraitClick}
-          />
-        ))}
-      </div>
-
-      <PointsDisplay
-        characters={characters}
-        markedCells={markedCells}
-        onRefreshClick={handleRefreshClick}
-      />
-
-      {selectedCharacter && (
-        <PortraitOverlay
-          character={selectedCharacter}
-          onClose={handleClosePortrait}
-          onClaim={handleClaimCharacter}
-          sourcePosition={sourcePosition}
-          isClaimed={selectedCharacter.index !== undefined && markedCells.has(selectedCharacter.index)}
-        />
-      )}
-
-      {showRefreshConfirmation && (
-        <ConfirmationModal
-          onCancel={handleCancelRefresh}
-          onConfirm={handleConfirmRefresh}
-        />
-      )}
-    </>
-  );
+  // If logged in, render the protected component
+  return children;
 };
 
-// Leaderboard component
-const Leaderboard = () => {
-  // Dummy data for the leaderboard
-  const leaderboardData = [
-    { name: "Samb", score: 320 },
-    { name: "Law", score: 280 },
-    { name: "Mayjay", score: 350 },
-    { name: "Bong", score: 210 }
-  ];
-
-  // Sort data by score in descending order
-  const sortedData = [...leaderboardData].sort((a, b) => b.score - a.score);
-
-  // Find the maximum score for scaling
-  const maxScore = Math.max(...sortedData.map(user => user.score));
-
+// Rules component
+export const Rules = () => {
   return (
-    <div className="leaderboard-section">
-      <h2>Leaderboard</h2>
-      <div className="leaderboard-container">
-        {sortedData.map((user, index) => (
-          <div key={index} className="leaderboard-entry">
-            <div className="user-rank">{index + 1}</div>
-            <div className="user-name">{user.name}</div>
-            <div className="score-bar-container">
-              <div
-                className="score-bar"
-                style={{ width: `${(user.score / maxScore) * 100}%` }}
-              ></div>
-              <span className="score-value">{user.score}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Main App component
-const App = () => {
-  return (
-    <div className="app-container">
-      <header className="app-header">
-        <div className="logo-container">
-          <img src={`${process.env.PUBLIC_URL}/title-logo.png`} alt="Bimbo Hunter Logo" className="title-logo" />
-        </div>
-        <p>Thank you for competing in Official 2025 Bimbo Hunt! Please read our <a href="#how-to-play">#how to play</a> and <a href="#rules">#rules</a> before starting your game.</p>
-      </header>
-      <BingoBoard />
-      <Leaderboard />
+    <div className="rules-container">
       <div id="how-to-play" className="rules-section">
         <h2>How to Play</h2>
         <p>Ready to start hunting? Here's what to do:</p>
@@ -628,10 +558,90 @@ const App = () => {
         </ol>
         <p>Good luck, and happy hunting!</p>
       </div>
-      <footer className="app-footer">
-        <p>Enjoy the game!</p>
-      </footer>
     </div>
+  );
+};
+
+// Header component with location awareness
+const AppHeader = () => {
+  const location = useLocation();
+  const { user } = useUser();
+
+  // Show links on all protected routes (when user is logged in and not on the standalone rules page)
+  const isProtectedRoute = user && location.pathname !== '/rules' && location.pathname !== '/';
+
+  return (
+    <header className="app-header">
+      <div className="logo-container">
+        <img src={`${process.env.PUBLIC_URL}/title-logo.png`} alt="Bimbo Hunter Logo" className="title-logo" />
+      </div>
+      <p>
+        Thank you for competing in Official 2025 Bimbo Hunt!
+        {isProtectedRoute && (
+          <span className="header-links">
+            Check out <a href="#how-to-play">How to Play</a> and <a href="#rules">Rules</a> below
+          </span>
+        )}
+      </p>
+    </header>
+  );
+};
+
+// Main App component
+const AppContent = () => {
+  return (
+    <Router>
+      <AppRoutes />
+    </Router>
+  );
+};
+
+// Routes component with header
+const AppRoutes = () => {
+  return (
+    <div className="app-container">
+      <AppHeader />
+
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Login />} />
+          <Route path="/rules" element={<div className="standalone-rules-page"><Rules /></div>} />
+
+          {/* Protected routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/board/:userId"
+            element={
+              <ProtectedRoute>
+                <BoardViewer />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Fallback route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+
+        <footer className="app-footer">
+          <p>Enjoy the game!</p>
+        </footer>
+      </div>
+  );
+};
+
+// Wrap the app with the UserProvider
+const App = () => {
+  return (
+    <UserProvider>
+      <AppContent />
+    </UserProvider>
   );
 };
 
