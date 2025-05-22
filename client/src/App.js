@@ -11,6 +11,14 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
 
   const portraitUrl = getPortraitUrl(character.Portrait);
 
+  // Get the frame overlay URL based on rarity
+  const getFrameOverlayUrl = (rarity) => {
+    if (rarity === 'FREE') return null; // No overlay for FREE
+    return `${process.env.PUBLIC_URL}/frames/${rarity} - Portrait.png`;
+  };
+
+  const frameOverlayUrl = getFrameOverlayUrl(character.rarity);
+
   // Use state to control animation classes and details visibility
   const [isVisible, setIsVisible] = React.useState(false);
   const [showDetails, setShowDetails] = React.useState(false);
@@ -76,11 +84,20 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
         } : {}}
       >
         <button className="close-button" onClick={handleClose}>×</button>
-        <img
-          src={portraitUrl}
-          alt={character.Name}
-          className="character-portrait"
-        />
+        <div className="portrait-image-container">
+          <img
+            src={portraitUrl}
+            alt={character.Name}
+            className="character-portrait"
+          />
+          {frameOverlayUrl && (
+            <img
+              src={frameOverlayUrl}
+              alt={`${character.rarity} frame`}
+              className="portrait-frame-overlay"
+            />
+          )}
+        </div>
         <div className="portrait-buttons">
           <button
             className={`claim-button ${isClaimed ? 'unclaim' : ''}`}
@@ -147,6 +164,14 @@ const BingoSquare = ({ character, isMarked, onClick, onPortraitClick, index }) =
   // Get the thumbnail URL using the thumbnail path
   const thumbnailUrl = getThumbnailUrl(character.Thumbnail);
 
+  // Get the frame overlay URL based on rarity
+  const getFrameOverlayUrl = (rarity) => {
+    if (rarity === 'FREE') return null; // No overlay for FREE squares
+    return `${process.env.PUBLIC_URL}/frames/${rarity} - Thumbnail.png`;
+  };
+
+  const frameOverlayUrl = getFrameOverlayUrl(character.rarity);
+
   // Handle click on the thumbnail to show portrait
   const handleThumbnailClick = (e) => {
     e.stopPropagation(); // Prevent the square's onClick from firing
@@ -181,6 +206,13 @@ const BingoSquare = ({ character, isMarked, onClick, onPortraitClick, index }) =
           alt={character.Name}
           className="character-thumbnail"
         />
+        {frameOverlayUrl && (
+          <img
+            src={frameOverlayUrl}
+            alt={`${character.rarity} frame`}
+            className="frame-overlay"
+          />
+        )}
       </div>
     </div>
   );
