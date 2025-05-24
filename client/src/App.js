@@ -114,7 +114,7 @@ const AppRoutes = () => {
             }
           />
           <Route
-            path="/board/:userId"
+            path="/boards/:displayName"
             element={
               <ProtectedRoute>
                 <BoardViewer />

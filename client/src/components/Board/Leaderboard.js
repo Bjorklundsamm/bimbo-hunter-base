@@ -45,8 +45,8 @@ const Leaderboard = () => {
   const maxScore = Math.max(...sortedData.map(user => user.score || 0), 1); // Ensure we don't divide by zero
 
   // Handle clicking on a user's score bar to view their board
-  const handleViewUserBoard = (userId) => {
-    navigate(`/boards/${userId}`);
+  const handleViewUserBoard = (displayName) => {
+    navigate(`/boards/${encodeURIComponent(displayName)}`);
   };
 
   if (loading) {
@@ -78,7 +78,7 @@ const Leaderboard = () => {
               <div className="user-name">{user.display_name}</div>
               <div
                 className="score-bar-container"
-                onClick={() => handleViewUserBoard(user.user_id)}
+                onClick={() => handleViewUserBoard(user.display_name)}
                 title={`View ${user.display_name}'s board`}
               >
                 <div

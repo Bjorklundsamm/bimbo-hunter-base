@@ -8,8 +8,8 @@ import Leaderboard from './Leaderboard';
 import { Rules } from '../../App';
 
 const BoardViewer = () => {
-  // Get user ID from URL params
-  const { userId } = useParams();
+  // Get display name from URL params
+  const { displayName } = useParams();
   const navigate = useNavigate();
 
   // Get current user from context
@@ -23,7 +23,7 @@ const BoardViewer = () => {
   const [error, setError] = useState(null);
 
   // Determine if this is the current user's board
-  const isOwnBoard = user && parseInt(userId) === user.id;
+  const isOwnBoard = user && displayName.toLowerCase() === user.display_name.toLowerCase();
 
   // Fetch board data and owner info
   useEffect(() => {
@@ -31,34 +31,22 @@ const BoardViewer = () => {
       try {
         setLoading(true);
 
-        // Fetch all users to find the board owner
-        const usersResponse = await fetch('http://localhost:5000/api/users');
-
-        if (!usersResponse.ok) {
-          throw new Error(`HTTP error! Status: ${usersResponse.status}`);
-        }
-
-        const usersData = await usersResponse.json();
-        const owner = usersData.find(u => u.id === parseInt(userId));
-
-        if (!owner) {
-          throw new Error('User not found');
-        }
-
-        setBoardOwner(owner);
-
-        // Fetch the user's board
-        const boardResponse = await fetch(`http://localhost:5000/api/users/${userId}/board`);
+        // Fetch the user's board by display name
+        const boardResponse = await fetch(`http://localhost:5000/api/boards/${encodeURIComponent(displayName)}`);
 
         if (!boardResponse.ok) {
+          if (boardResponse.status === 404) {
+            throw new Error('User not found or no board exists for this user');
+          }
           throw new Error(`HTTP error! Status: ${boardResponse.status}`);
         }
 
         const boardData = await boardResponse.json();
-        setBoard(boardData);
+        setBoard(boardData.board);
+        setBoardOwner(boardData.user);
 
         // Fetch the board progress
-        const progressResponse = await fetch(`http://localhost:5000/api/users/${userId}/boards/${boardData.id}/progress`);
+        const progressResponse = await fetch(`http://localhost:5000/api/boards/${encodeURIComponent(displayName)}/progress`);
 
         if (!progressResponse.ok) {
           throw new Error(`HTTP error! Status: ${progressResponse.status}`);
@@ -69,14 +57,14 @@ const BoardViewer = () => {
 
       } catch (err) {
         console.error('Error fetching board data:', err);
-        setError('Failed to load board data. Please try again later.');
+        setError(err.message || 'Failed to load board data. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchBoardData();
-  }, [userId]);
+  }, [displayName]);
 
   // Handle back to dashboard button
   const handleBackToDashboard = () => {
@@ -108,12 +96,12 @@ const BoardViewer = () => {
         </h1>
       </div>
 
-      {board && progress && (
+      {board && progress && boardOwner && (
         <BingoBoard
           boardData={board.board_data}
           progressData={progress}
           isReadOnly={!isOwnBoard}
-          userId={parseInt(userId)}
+          userId={boardOwner.id}
           boardId={board.id}
         />
       )}

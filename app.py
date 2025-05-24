@@ -99,7 +99,7 @@ def register():
     if user:
         return jsonify({'success': True, 'user': user})
     else:
-        return jsonify({'error': 'Failed to create user'}), 500
+        return jsonify({'error': 'Display name already taken or failed to create user'}), 400
 
 @app.route('/api/users', methods=['GET'])
 def get_users():
@@ -137,6 +137,54 @@ def create_user_board(user_id):
         return jsonify(new_board)
     else:
         return jsonify({'error': 'Failed to create board'}), 500
+
+# Board access by display name
+@app.route('/api/boards/<display_name>', methods=['GET'])
+def get_board_by_display_name(display_name):
+    """Get a user's board by their display name"""
+    # Get user by display name
+    user = User.get_by_display_name(display_name)
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Get the user's board
+    board = Board.get_by_user(user['id'])
+
+    if board:
+        # Also include user info for the response
+        response_data = {
+            'board': board,
+            'user': user
+        }
+        return jsonify(response_data)
+    else:
+        return jsonify({'error': 'No board found for this user'}), 404
+
+@app.route('/api/boards/<display_name>/progress', methods=['GET'])
+def get_board_progress_by_display_name(display_name):
+    """Get a user's board progress by their display name"""
+    # Get user by display name
+    user = User.get_by_display_name(display_name)
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Get the user's board
+    board = Board.get_by_user(user['id'])
+
+    if not board:
+        return jsonify({'error': 'No board found for this user'}), 404
+
+    # Get progress
+    progress = Progress.get_by_user_board(user['id'], board['id'])
+
+    if progress:
+        return jsonify(progress)
+    else:
+        # Initialize empty progress
+        new_progress = Progress.create_or_update(user['id'], board['id'], [], 0)
+        return jsonify(new_progress)
 
 # Progress Tracking Endpoints
 

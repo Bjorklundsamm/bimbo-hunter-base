@@ -22,7 +22,7 @@ DB_FILE = "bhunter.db"
 def get_db_connection():
     """
     Create a database connection to the SQLite database.
-    
+
     Returns:
         Connection object or None
     """
@@ -50,12 +50,12 @@ def init_db():
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         pin TEXT NOT NULL,
-        display_name TEXT NOT NULL,
+        display_name TEXT NOT NULL UNIQUE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """
-    
+
     create_boards_table = """
     CREATE TABLE IF NOT EXISTS boards (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -65,7 +65,7 @@ def init_db():
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
     """
-    
+
     create_progress_table = """
     CREATE TABLE IF NOT EXISTS progress (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,7 +78,7 @@ def init_db():
         FOREIGN KEY (board_id) REFERENCES boards (id) ON DELETE CASCADE
     );
     """
-    
+
     # Connect to database and create tables
     conn = get_db_connection()
     if conn is not None:
@@ -99,11 +99,54 @@ def init_db():
 def check_db_exists():
     """
     Check if the database file exists.
-    
+
     Returns:
         bool: True if exists, False otherwise
     """
     return os.path.exists(DB_FILE)
+
+def clear_database():
+    """
+    Clear all data from the database tables.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        print("Failed to connect to database")
+        return False
+
+    try:
+        cursor = conn.cursor()
+
+        # Delete all data from tables (in order due to foreign key constraints)
+        cursor.execute("DELETE FROM progress")
+        cursor.execute("DELETE FROM boards")
+        cursor.execute("DELETE FROM users")
+
+        conn.commit()
+        print("Database cleared successfully")
+        return True
+
+    except Error as e:
+        print(f"Error clearing database: {e}")
+        return False
+    finally:
+        if conn:
+            conn.close()
+
+def create_test_user():
+    """
+    Create a test user named 'Mayjay'.
+    """
+    from models import User
+
+    # Create test user
+    user = User.create("1234", "Mayjay")
+    if user:
+        print(f"Test user created: {user}")
+        return user
+    else:
+        print("Failed to create test user")
+        return None
 
 # Initialize the database if it doesn't exist
 if not check_db_exists():

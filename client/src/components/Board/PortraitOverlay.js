@@ -9,6 +9,14 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
 
   const portraitUrl = getPortraitUrl(character.Portrait);
 
+  // Get the frame overlay URL based on character rarity
+  const getFrameOverlayUrl = (rarity) => {
+    if (!rarity || rarity === 'FREE') return null; // No frame for FREE characters
+    return `${process.env.PUBLIC_URL}/frames/${rarity} - Portrait.png`;
+  };
+
+  const frameOverlayUrl = getFrameOverlayUrl(character.rarity);
+
   // Use state to control animation classes and details visibility
   const [isVisible, setIsVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -34,7 +42,7 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
   // Handle claiming with animation
   const handleClaim = () => {
     if (isReadOnly) return; // Disable claiming for read-only mode
-    
+
     setIsVisible(false);
     setShowDetails(false);
     // Wait for animation to complete before actually claiming
@@ -64,6 +72,24 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
     }
   };
 
+  // Get rarity color for details button
+  const getRarityColor = (rarity) => {
+    switch (rarity) {
+      case 'FREE':
+        return '#4CAF50'; // Green
+      case 'R':
+        return '#2196F3'; // Blue
+      case 'SR':
+        return '#9C27B0'; // Purple
+      case 'SSR':
+        return '#FF9800'; // Orange
+      case 'UR+':
+        return '#F44336'; // Red
+      default:
+        return '#2196F3'; // Default blue
+    }
+  };
+
   return (
     <div className={`portrait-overlay ${isVisible ? 'visible' : ''}`}>
       <div
@@ -74,11 +100,20 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
         } : {}}
       >
         <button className="close-button" onClick={handleClose}>×</button>
-        <img
-          src={portraitUrl}
-          alt={character.Name}
-          className="character-portrait"
-        />
+        <div className="portrait-image-container">
+          <img
+            src={portraitUrl}
+            alt={character.Name}
+            className="character-portrait"
+          />
+          {frameOverlayUrl && (
+            <img
+              src={frameOverlayUrl}
+              alt={`${character.rarity} frame`}
+              className="portrait-frame-overlay"
+            />
+          )}
+        </div>
         <div className="portrait-buttons">
           {!isReadOnly && (
             <button
@@ -88,7 +123,16 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
               {isClaimed ? 'Unclaim' : 'Claim!'}
             </button>
           )}
-          <button className="details-button" onClick={handleToggleDetails}>Details</button>
+          <button
+            className="details-button"
+            onClick={handleToggleDetails}
+            style={{
+              backgroundColor: getRarityColor(character.rarity),
+              boxShadow: `0 0 20px ${getRarityColor(character.rarity)}80, 0 4px 6px rgba(0, 0, 0, 0.1)`
+            }}
+          >
+            Details
+          </button>
         </div>
 
         {showDetails && (

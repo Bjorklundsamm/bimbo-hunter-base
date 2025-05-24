@@ -65,12 +65,12 @@ const UserDashboard = () => {
 
   // Navigate to current user's board
   const viewMyBoard = () => {
-    navigate(`/board/${user.id}`);
+    navigate(`/boards/${encodeURIComponent(user.display_name)}`);
   };
 
   // Navigate to another user's board
-  const viewUserBoard = (userId) => {
-    navigate(`/board/${userId}`);
+  const viewUserBoard = (displayName) => {
+    navigate(`/boards/${encodeURIComponent(displayName)}`);
   };
 
   // Create a new board for the current user
@@ -94,7 +94,7 @@ const UserDashboard = () => {
       setUserBoard(boardData);
 
       // Navigate to the new board
-      navigate(`/board/${user.id}`);
+      navigate(`/boards/${encodeURIComponent(user.display_name)}`);
     } catch (err) {
       console.error('Error creating new board:', err);
       setError('Failed to create new board. Please try again later.');
@@ -135,7 +135,7 @@ const UserDashboard = () => {
       setUserBoard(boardData);
 
       // Navigate to the new board
-      navigate(`/board/${user.id}`);
+      navigate(`/boards/${encodeURIComponent(user.display_name)}`);
     } catch (err) {
       console.error('Error refreshing board:', err);
       setError('Failed to refresh board. Please try again later.');
@@ -185,7 +185,7 @@ const UserDashboard = () => {
                 <div key={u.id} className="user-item">
                   <span className="user-name">{u.display_name}</span>
                   <button
-                    onClick={() => viewUserBoard(u.id)}
+                    onClick={() => viewUserBoard(u.display_name)}
                     className="view-board-button"
                   >
                     View Board

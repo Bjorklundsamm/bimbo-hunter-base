@@ -48,6 +48,15 @@ class User:
                 conn.close()
                 return dict(existing_user)
 
+            # Check if display name is already taken
+            cursor.execute("SELECT * FROM users WHERE display_name = ?", (display_name,))
+            existing_display_name = cursor.fetchone()
+
+            if existing_display_name:
+                logger.warning(f"Display name '{display_name}' is already taken")
+                conn.close()
+                return None
+
             # Create new user
             cursor.execute(
                 "INSERT INTO users (pin, display_name) VALUES (?, ?)",
@@ -100,6 +109,34 @@ class User:
 
         except Error as e:
             logger.error(f"Error getting user by PIN: {e}")
+            return None
+        finally:
+            conn.close()
+
+    @staticmethod
+    def get_by_display_name(display_name):
+        """
+        Get a user by display name.
+
+        Args:
+            display_name (str): User's display name
+
+        Returns:
+            dict: User data if found, None otherwise
+        """
+        conn = get_db_connection()
+        if conn is None:
+            return None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE display_name = ?", (display_name,))
+            user = cursor.fetchone()
+
+            return dict(user) if user else None
+
+        except Error as e:
+            logger.error(f"Error getting user by display name: {e}")
             return None
         finally:
             conn.close()
