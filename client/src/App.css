@@ -374,6 +374,7 @@
   align-items: center;
   overflow: hidden; /* Ensure images don't overflow */
   cursor: pointer;
+  position: relative; /* Added for absolute positioning of stars */
 }
 
 .character-thumbnail {
@@ -392,6 +393,24 @@
 
 .thumbnail-container:active .character-thumbnail {
   transform: scale(0.95);
+}
+
+/* Star rating system for rarity */
+.rarity-stars {
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  z-index: 4; /* Below the claimed overlay but above the thumbnail */
+  pointer-events: none; /* Ensure clicks pass through to the thumbnail */
+}
+
+.star {
+  font-size: 18px; /* Increased from 14px */
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.7)); /* Add shadow for better visibility */
 }
 
 .bingo-square:hover {
@@ -1134,6 +1153,16 @@
   .bingo-square.free.marked::after {
     font-size: 2.2rem; /* Slightly larger size for very small screens */
   }
+
+  /* Smaller stars for very small screens */
+  .rarity-stars {
+    bottom: 2px;
+    gap: 1px;
+  }
+
+  .star {
+    font-size: 14px; /* Increased from 10px */
+  }
 }
 
 /* Mobile devices in portrait mode */
@@ -1354,6 +1383,16 @@
   .bingo-square.free.marked::after {
     font-size: 2.8rem; /* Increased size for tablets */
   }
+
+  /* Larger stars for tablets */
+  .rarity-stars {
+    bottom: 8px;
+    gap: 3px;
+  }
+
+  .star {
+    font-size: 24px; /* Increased from 18px */
+  }
 }
 
 /* Large screens and desktops */
@@ -1377,5 +1416,16 @@
 
   .bingo-square.free.marked::after {
     font-size: 3.5rem; /* Increased size for desktops */
+  }
+
+  /* Larger stars for big screens */
+  .rarity-stars {
+    bottom: 10px;
+    gap: 4px;
+  }
+
+  .star {
+    font-size: 28px; /* Increased from 22px */
+    filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.8));
   }
 }

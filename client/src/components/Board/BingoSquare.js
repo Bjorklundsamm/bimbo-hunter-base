@@ -19,6 +19,24 @@ const BingoSquare = ({ character, isMarked, onClick, onPortraitClick, index, isR
     }
   };
 
+  // Get the number of stars based on rarity
+  const getRarityStars = (rarity) => {
+    switch (rarity) {
+      case 'FREE':
+        return 1; // Green - 1 star
+      case 'R':
+        return 2; // Blue - 2 stars
+      case 'SR':
+        return 3; // Purple - 3 stars
+      case 'SSR':
+        return 4; // Orange - 4 stars
+      case 'UR+':
+        return 5; // Red - 5 stars
+      default:
+        return 0;
+    }
+  };
+
   // Get the local file path for the thumbnail
   const getThumbnailUrl = (thumbnailPath) => {
     if (!thumbnailPath) return null;
@@ -51,12 +69,18 @@ const BingoSquare = ({ character, isMarked, onClick, onPortraitClick, index, isR
   // Add 'free' class if this is the FREE square
   const isFreeSquare = character.rarity === 'FREE';
 
+  // Get the number of stars for this rarity
+  const starCount = getRarityStars(character.rarity);
+
+  // Get the color for the stars (same as border color)
+  const starColor = getRarityColor(character.rarity);
+
   return (
     <div
       className={`bingo-square ${isMarked ? 'marked' : ''} ${isFreeSquare ? 'free' : ''} ${isReadOnly ? 'read-only' : ''}`}
       onClick={isReadOnly ? null : onClick}
       style={{
-        borderColor: getRarityColor(character.rarity),
+        borderColor: starColor,
         backgroundColor: 'transparent',
         position: 'relative',
         cursor: isReadOnly ? 'default' : 'pointer'
@@ -68,6 +92,35 @@ const BingoSquare = ({ character, isMarked, onClick, onPortraitClick, index, isR
           alt={character.Name}
           className="character-thumbnail"
         />
+        {/* Star rating system - only show on thumbnails, not portraits */}
+        <div className="rarity-stars">
+          {[...Array(starCount)].map((_, i) => {
+            // Calculate if this is the center star
+            const isCenterStar = i === Math.floor(starCount / 2);
+
+            // For even numbers of stars, make the two middle stars slightly larger
+            const isMiddlePair = starCount % 2 === 0 && (i === starCount / 2 - 1 || i === starCount / 2);
+
+            // Calculate distance from center for graduated sizing
+            const distanceFromCenter = Math.abs(i - (starCount - 1) / 2);
+            // Increase the size difference between center and outer stars
+            const sizeMultiplier = 1 - (distanceFromCenter * 0.25);
+
+            return (
+              <span
+                key={i}
+                className={`star ${isCenterStar ? 'center-star' : ''} ${isMiddlePair ? 'middle-pair' : ''}`}
+                style={{
+                  color: starColor,
+                  fontSize: `${sizeMultiplier * 100}%`,
+                  transform: `scale(${sizeMultiplier})`
+                }}
+              >
+                ★
+              </span>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
