@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
 import './App.css';
 
 // Import components
@@ -7,6 +7,7 @@ import { UserProvider, useUser } from './components/Auth/UserContext';
 import Login from './components/Auth/Login';
 import UserDashboard from './components/Dashboard/UserDashboard';
 import BoardViewer from './components/Board/BoardViewer';
+import HowToPlay from './components/HowToPlay/HowToPlay';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -30,17 +31,6 @@ const ProtectedRoute = ({ children }) => {
 export const Rules = () => {
   return (
     <div className="rules-container">
-      <div id="how-to-play" className="rules-section">
-        <h2>How to Play</h2>
-        <p>Ready to start hunting? Here's what to do:</p>
-        <ol>
-          <li>Find people wearing the cosplays on your board and ask to get a picture with them.</li>
-          <li>Upload your picture to claim the slot and accumulate points.</li>
-          <li>If you're too shy to ask for a picture, remember how excited you feel when someone recognizes your cosplay and think about how nice it is to offer that to them!</li>
-          <li>Prizes will be awarded to the first and second place winners, as well as the person who earned the most overall points.</li>
-        </ol>
-        <p>Remember, cosplayers love to be recognized and appreciated for their hard work!</p>
-      </div>
       <div id="rules" className="rules-section">
         <h2>Rules</h2>
         <p>Please follow these important guidelines for a fun and respectful experience:</p>
@@ -76,7 +66,7 @@ const AppHeader = () => {
         Thank you for competing in Official 2025 Bimbo Hunt!
         {isProtectedRoute && (
           <span className="header-links">
-            Check out <a href="#how-to-play">How to Play</a> and <a href="#rules">Rules</a> below
+            Check out <Link to="/how-to-play">How to Play</Link> and <a href="#rules">Rules</a> below
           </span>
         )}
       </p>
@@ -105,6 +95,14 @@ const AppRoutes = () => {
           <Route path="/rules" element={<div className="standalone-rules-page"><Rules /></div>} />
 
           {/* Protected routes */}
+          <Route
+            path="/how-to-play"
+            element={
+              <ProtectedRoute>
+                <HowToPlay />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={
