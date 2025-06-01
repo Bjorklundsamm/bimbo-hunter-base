@@ -14,6 +14,8 @@ const UserDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showRefreshConfirmation, setShowRefreshConfirmation] = useState(false);
+  const [showAgreementModal, setShowAgreementModal] = useState(false);
+  const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
 
   // Fetch all users and check if current user has a board on component mount
   useEffect(() => {
@@ -41,6 +43,9 @@ const UserDashboard = () => {
           if (boardResponse.ok) {
             const boardData = await boardResponse.json();
             setUserBoard(boardData);
+            // If user has a board, redirect them to their board immediately
+            navigate(`/boards/${encodeURIComponent(user.display_name)}`);
+            return; // Exit early since we're redirecting
           } else if (boardResponse.status !== 404) {
             // Only throw error if it's not a 404 (no board found)
             throw new Error(`HTTP error! Status: ${boardResponse.status}`);
@@ -73,10 +78,32 @@ const UserDashboard = () => {
     navigate(`/boards/${encodeURIComponent(displayName)}`);
   };
 
+  // Show the agreement modal
+  const handleStartPlayingClick = () => {
+    setShowAgreementModal(true);
+  };
+
+  // Handle agreement modal confirmation
+  const handleAgreementConfirm = () => {
+    if (!hasAgreedToTerms) {
+      setError('Please agree to review the How to Play section and Rules before starting.');
+      return;
+    }
+    setShowAgreementModal(false);
+    createNewBoard();
+  };
+
+  // Handle agreement modal cancellation
+  const handleAgreementCancel = () => {
+    setShowAgreementModal(false);
+    setHasAgreedToTerms(false);
+  };
+
   // Create a new board for the current user
   const createNewBoard = async () => {
     try {
       setLoading(true);
+      setError(null);
 
       const response = await fetch(`http://localhost:5000/api/users/${user.id}/board`, {
         method: 'POST',
@@ -160,15 +187,18 @@ const UserDashboard = () => {
       <div className="dashboard-actions">
         {loading ? (
           <div className="loading-message">Loading...</div>
-        ) : userBoard ? (
-          <button onClick={viewMyBoard} className="action-button">
-            View My Board
-          </button>
-        ) : (
-          <button onClick={createNewBoard} className="action-button">
-            Generate a Board
-          </button>
-        )}
+        ) : !userBoard ? (
+          <div className="board-creation-section">
+            <h2>Ready to Start Playing?</h2>
+            <button
+              onClick={handleStartPlayingClick}
+              className="start-playing-button enabled"
+              disabled={loading}
+            >
+              Start Playing!
+            </button>
+          </div>
+        ) : null}
       </div>
 
       {error && <div className="error-message">{error}</div>}
@@ -216,6 +246,42 @@ const UserDashboard = () => {
               </button>
               <button onClick={handleConfirmRefresh} className="confirm-button">
                 Yes, Refresh My Board
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Agreement modal */}
+      {showAgreementModal && (
+        <div className="confirmation-overlay">
+          <div className="agreement-modal">
+            <h3>Before You Start Playing</h3>
+            <div className="agreement-text">
+              <p>
+                Before playing or making any complaints, you must read the <a href="/how-to-play" target="_blank" rel="noopener noreferrer">How to Play</a> section and the <a href="#rules">Rules</a> to understand the game mechanics, scoring system, and proper etiquette.
+              </p>
+            </div>
+            <div className="agreement-checkbox-section">
+              <label className="agreement-checkbox">
+                <input
+                  type="checkbox"
+                  checked={hasAgreedToTerms}
+                  onChange={(e) => setHasAgreedToTerms(e.target.checked)}
+                />
+                I promise
+              </label>
+            </div>
+            <div className="confirmation-buttons">
+              <button onClick={handleAgreementCancel} className="cancel-button">
+                Cancel
+              </button>
+              <button
+                onClick={handleAgreementConfirm}
+                className={`confirm-button ${hasAgreedToTerms ? 'enabled' : 'disabled'}`}
+                disabled={!hasAgreedToTerms}
+              >
+                Start Playing!
               </button>
             </div>
           </div>
