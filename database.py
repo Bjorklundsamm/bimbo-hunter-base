@@ -72,6 +72,7 @@ def init_db():
         user_id INTEGER NOT NULL,
         board_id INTEGER NOT NULL,
         marked_cells TEXT NOT NULL,
+        user_images TEXT DEFAULT '{}',
         score INTEGER DEFAULT 0,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,

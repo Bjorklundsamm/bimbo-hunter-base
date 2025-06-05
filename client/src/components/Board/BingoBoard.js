@@ -11,6 +11,7 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [markedCells, setMarkedCells] = useState(new Set());
+  const [userImages, setUserImages] = useState({});
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [sourcePosition, setSourcePosition] = useState(null);
   const [showRefreshConfirmation, setShowRefreshConfirmation] = useState(false);
@@ -27,7 +28,10 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
         // Set marked cells from progress data
         const markedSet = new Set(progressData.marked_cells);
         setMarkedCells(markedSet);
-        
+
+        // Set user images from progress data
+        setUserImages(progressData.user_images || {});
+
         // Set score from progress data
         setScore(progressData.score);
 
@@ -56,6 +60,7 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
             },
             body: JSON.stringify({
               marked_cells: Array.from(markedCells),
+              user_images: userImages,
               score: newScore
             }),
           });
@@ -72,7 +77,7 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
     if (markedCells.size > 0 && !isReadOnly) {
       saveProgress();
     }
-  }, [markedCells, isReadOnly, userId, boardId, characters]);
+  }, [markedCells, userImages, isReadOnly, userId, boardId, characters]);
 
   // Function to fetch characters and generate a new board
   const fetchCharactersAndGenerateBoard = async () => {
@@ -109,7 +114,10 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
       // Set marked cells from new progress data
       const markedSet = new Set(newProgressData.marked_cells);
       setMarkedCells(markedSet);
-      
+
+      // Set user images from new progress data
+      setUserImages(newProgressData.user_images || {});
+
       // Set score from new progress data
       setScore(newProgressData.score);
 
@@ -136,6 +144,7 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
   const handleConfirmRefresh = () => {
     // Reset state
     setMarkedCells(new Set());
+    setUserImages({});
     setSelectedCharacter(null);
     setSourcePosition(null);
     setShowRefreshConfirmation(false);
@@ -177,26 +186,33 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
   };
 
   // Handle claiming or unclaiming a character
-  const handleClaimCharacter = () => {
+  const handleClaimCharacter = (imagePath = null) => {
     if (isReadOnly) return; // Disable claiming for read-only mode
-    
+
     if (selectedCharacter && selectedCharacter.index !== undefined) {
       const index = selectedCharacter.index;
       const newMarkedCells = new Set(markedCells);
+      const newUserImages = { ...userImages };
 
       // Toggle the claim status (except for FREE square)
       if (characters[index].rarity === 'FREE') {
         // FREE square should always remain claimed
         newMarkedCells.add(index);
-      } else if (newMarkedCells.has(index)) {
-        // Unclaim if already claimed
+      } else if (newMarkedCells.has(index) && imagePath === null) {
+        // Unclaim if already claimed and no new image provided
         newMarkedCells.delete(index);
+        delete newUserImages[index];
+      } else if (imagePath) {
+        // Claim with uploaded image
+        newMarkedCells.add(index);
+        newUserImages[index] = imagePath;
       } else {
-        // Claim if not claimed
+        // This shouldn't happen with the new upload flow, but keep for safety
         newMarkedCells.add(index);
       }
 
       setMarkedCells(newMarkedCells);
+      setUserImages(newUserImages);
     }
 
     // Close the overlay
@@ -291,6 +307,7 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
             onClick={() => handleSquareClick(index)}
             onPortraitClick={handlePortraitClick}
             isReadOnly={isReadOnly}
+            userImage={userImages[index]}
           />
         ))}
       </div>
@@ -311,6 +328,9 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
           sourcePosition={sourcePosition}
           isClaimed={selectedCharacter.index !== undefined && markedCells.has(selectedCharacter.index)}
           isReadOnly={isReadOnly}
+          userId={userId}
+          boardId={boardId}
+          squareIndex={selectedCharacter.index}
         />
       )}
 

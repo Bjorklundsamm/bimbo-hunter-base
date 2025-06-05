@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BingoSquare = ({ character, isMarked, onClick, onPortraitClick, index, isReadOnly }) => {
+const BingoSquare = ({ character, isMarked, onClick, onPortraitClick, index, isReadOnly, userImage }) => {
   // Determine the border color based on rarity
   const getRarityColor = (rarity) => {
     switch (rarity) {
@@ -48,8 +48,10 @@ const BingoSquare = ({ character, isMarked, onClick, onPortraitClick, index, isR
     return `${process.env.PUBLIC_URL}/thumbnails/${filename}`;
   };
 
-  // Get the thumbnail URL using the thumbnail path
-  const thumbnailUrl = getThumbnailUrl(character.Thumbnail);
+  // Get the thumbnail URL using the thumbnail path or user image
+  const thumbnailUrl = (isMarked && userImage)
+    ? `${process.env.PUBLIC_URL}${userImage}`
+    : getThumbnailUrl(character.Thumbnail);
 
   // Handle click on the thumbnail to show portrait
   const handleThumbnailClick = (e) => {

@@ -20,7 +20,7 @@ const HowToPlay = () => {
       number: 3,
       title: "Approach with Respect and Ask for Permission",
       description: "Even if you're feeling shy or nervous, remember to approach cosplayers with confidence and respect. Cosplayers invest countless hours crafting their costumes and embodying their characters – one of the most rewarding feelings for them is being recognized and appreciated for their hard work. However, always remember that cosplay is NOT consent. Politely introduce yourself, compliment their craftsmanship, and ask for permission before taking any photos. Most cosplayers are happy to pose when approached respectfully!",
-      image: "3 - Even if your feeling shy, approach them and ask for a picture. Cosplayers work hard on their costumes and one of the most rewarding feelings is to be recognized and appreciated. That being said, cosplay is not consent, always ask for permission.png",
+      image: "3 - Even if your feeling shy, approach them and ask for a picture.png",
       position: "left"
     },
     {

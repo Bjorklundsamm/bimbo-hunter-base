@@ -1,6 +1,10 @@
 # app.py
 from flask import Flask, jsonify, send_from_directory, request
 import random
+import os
+import uuid
+from werkzeug.utils import secure_filename
+from PIL import Image
 import characters
 import tools
 import logging
@@ -18,6 +22,15 @@ logger = logging.getLogger(__name__)
 init_db()
 
 app = Flask(__name__, static_folder='resources')
+
+# Configuration for file uploads
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['UPLOAD_FOLDER'] = 'client/public/user-images'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Enable CORS manually
 @app.after_request
@@ -123,6 +136,9 @@ def get_user_board(user_id):
 @app.route('/api/users/<int:user_id>/board', methods=['POST'])
 def create_user_board(user_id):
     """Create a new board for a user"""
+    # Delete any existing boards for this user first
+    Board.delete_by_user(user_id)
+
     # Generate a new board
     board_data = tools.generate_balanced_bingo_board(characters.characters, random.randint(1, 10000))
     new_board = Board.create(user_id, board_data)
@@ -205,10 +221,11 @@ def update_progress(user_id, board_id):
     """Update a user's progress on a board"""
     data = request.json
     marked_cells = data.get('marked_cells', [])
+    user_images = data.get('user_images', {})
     score = data.get('score', 0)
 
     # Update progress
-    progress = Progress.create_or_update(user_id, board_id, marked_cells, score)
+    progress = Progress.create_or_update(user_id, board_id, marked_cells, score, user_images)
 
     if progress:
         return jsonify(progress)
@@ -220,6 +237,53 @@ def get_leaderboard():
     """Get the leaderboard"""
     leaderboard = Progress.get_leaderboard()
     return jsonify(leaderboard)
+
+# File Upload Endpoints
+
+@app.route('/api/users/<int:user_id>/boards/<int:board_id>/upload/<int:square_index>', methods=['POST'])
+def upload_square_image(user_id, board_id, square_index):
+    """Upload an image for a specific square"""
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+
+    file = request.files['file']
+
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+
+    if file and allowed_file(file.filename):
+        # Create directory structure if it doesn't exist
+        user_dir = os.path.join(app.config['UPLOAD_FOLDER'], str(user_id), str(board_id))
+        os.makedirs(user_dir, exist_ok=True)
+
+        # Generate unique filename
+        file_extension = file.filename.rsplit('.', 1)[1].lower()
+        filename = f"{square_index}.{file_extension}"
+        filepath = os.path.join(user_dir, filename)
+
+        try:
+            # Save and process the image
+            file.save(filepath)
+
+            # Resize image for optimal performance
+            with Image.open(filepath) as img:
+                # Convert to RGB if necessary (for JPEG compatibility)
+                if img.mode in ('RGBA', 'LA', 'P'):
+                    img = img.convert('RGB')
+
+                # Resize to max 800px on longest side while maintaining aspect ratio
+                img.thumbnail((800, 800), Image.Resampling.LANCZOS)
+                img.save(filepath, optimize=True, quality=85)
+
+            # Return the relative path for frontend use
+            relative_path = f"/user-images/{user_id}/{board_id}/{filename}"
+            return jsonify({'success': True, 'image_path': relative_path})
+
+        except Exception as e:
+            logger.error(f"Error processing uploaded image: {e}")
+            return jsonify({'error': 'Failed to process image'}), 500
+
+    return jsonify({'error': 'Invalid file type'}), 400
 
 @app.route('/resources/<path:path>')
 def serve_resources(path):

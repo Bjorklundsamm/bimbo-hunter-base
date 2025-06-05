@@ -1,3 +1,18 @@
+/* Font Face Declarations */
+@font-face {
+  font-family: 'Absender';
+  src: url('./fonts/TT Norms Pro Serif Trial DemiBold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Vividly';
+  src: url('./fonts/TT Norms Pro Serif Trial Light.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* App Container */
 .app-container {
   min-height: 100vh;
@@ -9,7 +24,7 @@
   justify-content: flex-start; /* Start from the top to ensure content is visible */
   padding: min(5vw, 1rem); /* Responsive padding */
   box-sizing: border-box; /* Include padding in width calculation */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Vividly', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
@@ -33,12 +48,14 @@
 }
 
 .auth-form-container h2 {
+  font-family: 'Absender', sans-serif;
   color: white;
   text-align: center;
   margin-bottom: 1.5rem;
 }
 
 .auth-error {
+  font-family: 'Vividly', sans-serif;
   background-color: rgba(244, 67, 54, 0.1);
   color: #F44336;
   border: 1px solid #F44336;
@@ -61,6 +78,7 @@
 }
 
 .form-group label {
+  font-family: 'Absender', sans-serif;
   color: white;
   font-weight: bold;
 }
@@ -81,6 +99,7 @@
 }
 
 .auth-button {
+  font-family: 'Absender', sans-serif;
   padding: 0.75rem;
   background-color: #4fc3f7;
   color: white;
@@ -108,6 +127,7 @@
 }
 
 .toggle-button {
+  font-family: 'Absender', sans-serif;
   background: none;
   border: none;
   color: #4fc3f7;
@@ -140,12 +160,14 @@
 }
 
 .dashboard-header h1 {
+  font-family: 'Absender', sans-serif;
   color: white;
   font-size: 1.8rem;
   margin: 0;
 }
 
 .logout-button {
+  font-family: 'Absender', sans-serif;
   background-color: rgba(244, 67, 54, 0.2);
   color: white;
   border: 1px solid rgba(244, 67, 54, 0.5);
@@ -197,6 +219,7 @@
 }
 
 .board-creation-section h2 {
+  font-family: 'Absender', sans-serif;
   color: white;
   font-size: 1.5rem;
   margin: 0;
@@ -204,6 +227,7 @@
 }
 
 .start-playing-button {
+  font-family: 'Absender', sans-serif;
   padding: 1rem 2rem;
   font-size: 1.2rem;
   font-weight: bold;
@@ -355,6 +379,7 @@
 }
 
 .board-viewer-header h1 {
+  font-family: 'Absender', sans-serif;
   color: rgba(255, 255, 255, 0.8);
   font-size: 2.2rem;
   margin: 0;
@@ -367,6 +392,7 @@
 }
 
 .back-button {
+  font-family: 'Absender', sans-serif;
   background-color: rgba(79, 195, 247, 0.2);
   color: white;
   border: none;
@@ -396,37 +422,89 @@
 
 /* App Header */
 .app-header {
-  margin-bottom: 2rem;
-  text-align: center;
+  margin-bottom: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  max-width: 800px;
+  width: 100%;
 }
 
 .logo-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 0.5rem;
+  flex-shrink: 0;
 }
 
 .title-logo {
-  max-width: 80%;
-  height: auto;
-  margin-bottom: 0.5rem;
+  height: 80px;
+  width: auto;
 }
 
-.app-header p {
-  font-size: 1.25rem;
+.thank-you-message {
+  flex: 1;
+}
+
+.thank-you-message p {
+  font-family: 'Vividly', sans-serif;
+  font-size: 1.1rem;
   color: rgba(255, 255, 255, 0.8);
+  margin: 0;
 }
 
-.app-header a {
-  color: #4fc3f7;
+/* Main Navigation */
+.main-navigation {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 25px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.nav-item {
+  font-family: 'Absender', sans-serif;
+  color: white;
   text-decoration: none;
-  font-weight: bold;
-  transition: color 0.2s ease-in-out;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+  position: relative;
 }
 
-.app-header a:hover {
-  color: #81d4fa;
-  text-decoration: underline;
+.nav-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 60%;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-item:hover {
+  color: #4fc3f7;
+  transform: translateY(-1px);
+}
+
+.nav-item.active {
+  color: #4fc3f7;
+  font-weight: bold;
 }
 
 /* Bingo Board */
@@ -484,18 +562,6 @@
   max-width: 100%; /* Ensure image doesn't exceed container width */
   max-height: 100%; /* Ensure image doesn't exceed container height */
   transition: transform 0.2s ease;
-  z-index: 1; /* Ensure thumbnail is below the frame overlay */
-}
-
-.frame-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 2; /* Position above the thumbnail */
-  pointer-events: none; /* Allow clicks to pass through to the thumbnail */
 }
 
 .thumbnail-container:hover .character-thumbnail {
@@ -544,7 +610,7 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.45); /* 45% opacity black overlay */
-  z-index: 10; /* Higher z-index to appear above the frame overlay */
+  z-index: 5; /* Lower z-index to ensure it doesn't block clicks */
   pointer-events: none; /* Ensure clicks pass through to the thumbnail */
 }
 
@@ -557,7 +623,7 @@
   color: rgba(255, 255, 255, 0.7); /* Semi-transparent white checkmark */
   font-size: min(60%, 1.8rem); /* Increased font size */
   font-weight: bold;
-  z-index: 11; /* Above the overlay but still low enough to not block clicks */
+  z-index: 6; /* Above the overlay but still low enough to not block clicks */
   pointer-events: none; /* Ensure clicks pass through to the thumbnail */
   text-align: center; /* Ensure text is centered */
   width: 100%; /* Take full width of container */
@@ -1107,6 +1173,7 @@
 }
 
 .how-to-play-header h1 {
+  font-family: 'Absender', sans-serif;
   font-size: 3rem;
   margin-bottom: 0.5rem;
   color: #4fc3f7;
@@ -1115,6 +1182,7 @@
 }
 
 .wikihow-subtitle {
+  font-family: 'Vividly', sans-serif;
   font-size: 1.4rem;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 1.5rem;
@@ -1130,6 +1198,7 @@
 }
 
 .wikihow-meta span {
+  font-family: 'Absender', sans-serif;
   background-color: rgba(79, 195, 247, 0.2);
   padding: 0.5rem 1rem;
   border-radius: 20px;
@@ -1152,6 +1221,7 @@
 }
 
 .wikihow-intro p {
+  font-family: 'Vividly', sans-serif;
   font-size: 1.1rem;
   line-height: 1.7;
   margin: 0;
@@ -1187,6 +1257,7 @@
 }
 
 .step-number {
+  font-family: 'Absender', sans-serif;
   background: linear-gradient(135deg, #4fc3f7, #29b6f6);
   color: white;
   width: 3rem;
@@ -1202,6 +1273,7 @@
 }
 
 .step-title {
+  font-family: 'Absender', sans-serif;
   font-size: 1.8rem;
   color: #4fc3f7;
   margin: 0;
@@ -1232,6 +1304,7 @@
 }
 
 .step-text p {
+  font-family: 'Vividly', sans-serif;
   font-size: 1.1rem;
   line-height: 1.7;
   color: rgba(255, 255, 255, 0.9);
@@ -1269,6 +1342,7 @@
 }
 
 .wikihow-conclusion h3 {
+  font-family: 'Absender', sans-serif;
   font-size: 2rem;
   color: #81c784;
   margin-bottom: 1rem;
@@ -1276,6 +1350,7 @@
 }
 
 .wikihow-conclusion p {
+  font-family: 'Vividly', sans-serif;
   font-size: 1.2rem;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.9);
@@ -1297,6 +1372,7 @@
   }
 
   .wikihow-meta span {
+    font-family: 'Absender', sans-serif;
     font-size: 0.8rem;
     padding: 0.4rem 0.8rem;
   }
@@ -1350,6 +1426,117 @@
   .wikihow-conclusion p {
     font-size: 1rem;
   }
+}
+
+/* Cards Component */
+.cards-container {
+  width: 100%;
+  max-width: 1200px;
+  padding: 1rem;
+  color: white;
+}
+
+.cards-container h1 {
+  font-family: 'Absender', sans-serif;
+  text-align: center;
+  color: #4fc3f7;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.cards-content {
+  width: 100%;
+}
+
+.rarity-section {
+  margin-bottom: 3rem;
+}
+
+.rarity-title {
+  font-family: 'Absender', sans-serif;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 0 1rem;
+}
+
+.card-item {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.card-item:hover {
+  transform: translateY(-5px);
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(79, 195, 247, 0.5);
+  box-shadow: 0 8px 25px rgba(79, 195, 247, 0.3);
+}
+
+.card-image-container {
+  position: relative;
+  margin-bottom: 0.75rem;
+}
+
+.card-thumbnail {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.card-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.card-info {
+  text-align: center;
+}
+
+.card-name {
+  font-family: 'Absender', sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  margin: 0 0 0.25rem 0;
+}
+
+.card-source {
+  font-family: 'Vividly', sans-serif;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.loading-message, .error-message {
+  font-family: 'Vividly', sans-serif;
+  text-align: center;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 2rem 0;
+}
+
+.error-message {
+  color: #f44336;
 }
 
 /* App Footer */
@@ -1454,6 +1641,7 @@
 }
 
 .claim-button {
+  font-family: 'Absender', sans-serif;
   padding: 10px 20px;
   background-color: transparent;
   color: white;
@@ -1486,6 +1674,7 @@
 }
 
 .details-button {
+  font-family: 'Absender', sans-serif;
   padding: 10px 15px;
   background-color: #2196F3; /* Default color, will be overridden by inline style */
   color: white;
@@ -1515,7 +1704,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 20; /* Higher z-index to appear above the frame overlay */
+  z-index: 10;
   border-radius: 4px;
   overflow: auto;
   cursor: pointer; /* Indicate it's clickable */
@@ -1523,24 +1712,151 @@
 
 .character-details-content {
   color: white;
-  padding: 20px;
-  max-width: 100%;
-  max-height: 100%;
+  padding: 30px;
+  width: 100%;
+  height: 100%;
   overflow-y: auto;
-  background-color: rgba(0, 0, 0, 0.5); /* Slightly different background to distinguish from overlay */
+  background-color: rgba(0, 0, 0, 0.9); /* Darker background for better readability */
   border-radius: 4px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   cursor: default; /* Reset cursor for content area */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .character-details-content p {
-  margin-bottom: 15px;
-  line-height: 1.5;
+  font-family: 'Vividly', sans-serif;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  font-size: 1.3em; /* Increased from default */
 }
 
 .character-details-content p strong {
-  color: #81d4fa; /* Light blue for headers */
-  font-size: 1.1em;
+  font-family: 'Absender', sans-serif;
+  color: #81d4fa; /* Light blue for headers - will be overridden by inline styles */
+  font-size: 1.4em; /* Increased from 1.1em */
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* Upload Interface Styles */
+.upload-interface {
+  background: rgba(0, 0, 0, 0.9);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  text-align: center;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.upload-interface h3 {
+  color: #fff;
+  margin: 0 0 10px 0;
+  font-size: 1.2em;
+  font-family: 'Absender', sans-serif;
+}
+
+.upload-interface p {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 20px 0;
+  font-size: 0.9em;
+  font-family: 'vividly', sans-serif;
+}
+
+.upload-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.upload-select-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1em;
+  font-family: 'Absender', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.upload-select-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.upload-select-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.selected-file-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.selected-file-info p {
+  color: #4CAF50;
+  font-weight: bold;
+  margin: 0;
+  font-size: 0.9em;
+}
+
+.upload-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.upload-confirm-button {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  font-family: 'Absender', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-confirm-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+}
+
+.upload-confirm-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.upload-cancel-button {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  font-family: 'Absender', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-cancel-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
+}
+
+.upload-cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Mobile adjustments for portrait overlay */
@@ -1552,19 +1868,6 @@
 
   .portrait-container.visible {
     transform: scale(1);
-  }
-
-  .portrait-image-container {
-    width: 100%;
-    height: auto;
-  }
-
-  .character-portrait {
-    max-height: 70vh; /* Slightly smaller on mobile */
-  }
-
-  .portrait-frame-overlay {
-    max-height: 70vh; /* Match the portrait size */
   }
 
   .close-button {
@@ -1597,12 +1900,18 @@
   }
 
   .character-details-content {
-    padding: 15px;
-    font-size: 14px;
+    padding: 20px;
+    font-size: 16px; /* Increased from 14px */
   }
 
   .character-details-content p {
-    margin-bottom: 10px;
+    margin-bottom: 6px; /* Reduced spacing for mobile */
+    font-size: 1.1em; /* Slightly smaller than desktop but still larger than before */
+  }
+
+  .character-details-content p strong {
+    font-size: 1.2em; /* Adjusted for mobile */
+    margin-bottom: 1px; /* Reduced spacing between header and text */
   }
 
   /* Faster transitions on mobile */
@@ -1612,6 +1921,33 @@
 
   .portrait-container {
     transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
+  }
+
+  /* Upload interface mobile adjustments */
+  .upload-interface {
+    padding: 15px;
+    margin-top: 15px;
+  }
+
+  .upload-interface h3 {
+    font-size: 1.1em;
+  }
+
+  .upload-interface p {
+    font-size: 0.85em;
+  }
+
+  .upload-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .upload-select-button,
+  .upload-confirm-button,
+  .upload-cancel-button {
+    padding: 10px 16px;
+    font-size: 0.9em;
+    min-width: 120px;
   }
 }
 
@@ -1669,12 +2005,37 @@
 
 /* Mobile devices in portrait mode */
 @media (orientation: portrait) {
-  .title-logo {
-    max-width: 90%; /* Slightly larger on mobile */
+  .header-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
   }
 
-  .app-header p {
+  .title-logo {
+    height: 65px;
+  }
+
+  .thank-you-message p {
     font-size: 1rem;
+  }
+
+  .nav-container {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .nav-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .card-thumbnail {
+    height: 120px;
   }
 
   .points-controls-container {
@@ -1766,11 +2127,28 @@
   }
 
   .app-header {
+    margin-bottom: 0.5rem;
+  }
+
+  .main-navigation {
     margin-bottom: 1rem;
   }
 
   .title-logo {
-    max-width: 60%; /* Smaller in landscape to save vertical space */
+    height: 55px;
+  }
+
+  .thank-you-message p {
+    font-size: 0.9rem;
+  }
+
+  .nav-container {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .nav-item {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
   }
 
   .bingo-board {

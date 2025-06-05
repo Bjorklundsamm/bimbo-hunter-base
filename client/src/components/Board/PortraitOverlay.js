@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaimed, isReadOnly }) => {
+const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaimed, isReadOnly, userId, boardId, squareIndex }) => {
   // Get the portrait URL from the portrait path
   const getPortraitUrl = (portraitPath) => {
     if (!portraitPath) return null;
@@ -20,6 +20,10 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
   // Use state to control animation classes and details visibility
   const [isVisible, setIsVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Apply the animation after component mounts
   useEffect(() => {
@@ -39,14 +43,61 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
     setTimeout(onClose, 300);
   };
 
-  // Handle claiming with animation
+  // Handle file selection
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setShowUpload(true);
+    }
+  };
+
+  // Handle file upload
+  const handleUpload = async () => {
+    if (!selectedFile || !userId || !boardId || squareIndex === undefined) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/users/${userId}/boards/${boardId}/upload/${squareIndex}`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Call onClaim with the uploaded image path
+        onClaim(result.image_path);
+        setIsVisible(false);
+        setShowDetails(false);
+        setShowUpload(false);
+      } else {
+        console.error('Upload failed');
+        alert('Failed to upload image. Please try again.');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Handle claiming with animation (for unclaiming)
   const handleClaim = () => {
     if (isReadOnly) return; // Disable claiming for read-only mode
 
-    setIsVisible(false);
-    setShowDetails(false);
-    // Wait for animation to complete before actually claiming
-    setTimeout(onClaim, 300);
+    if (isClaimed) {
+      // If already claimed, just unclaim
+      setIsVisible(false);
+      setShowDetails(false);
+      setTimeout(() => onClaim(null), 300);
+    } else {
+      // If not claimed, show upload interface
+      setShowUpload(true);
+    }
   };
 
   // Handle showing/hiding details
@@ -115,7 +166,7 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
           )}
         </div>
         <div className="portrait-buttons">
-          {!isReadOnly && (
+          {!isReadOnly && !showUpload && (
             <button
               className={`claim-button ${isClaimed ? 'unclaim' : ''}`}
               onClick={handleClaim}
@@ -123,17 +174,70 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
               {isClaimed ? 'Unclaim' : 'Claim!'}
             </button>
           )}
-          <button
-            className="details-button"
-            onClick={handleToggleDetails}
-            style={{
-              backgroundColor: getRarityColor(character.rarity),
-              boxShadow: `0 0 20px ${getRarityColor(character.rarity)}80, 0 4px 6px rgba(0, 0, 0, 0.1)`
-            }}
-          >
-            Details
-          </button>
+          {!showUpload && (
+            <button
+              className="details-button"
+              onClick={handleToggleDetails}
+              style={{
+                backgroundColor: getRarityColor(character.rarity),
+                boxShadow: `0 0 20px ${getRarityColor(character.rarity)}80, 0 4px 6px rgba(0, 0, 0, 0.1)`
+              }}
+            >
+              Details
+            </button>
+          )}
         </div>
+
+        {/* Upload Interface */}
+        {showUpload && !isReadOnly && (
+          <div className="upload-interface">
+            <h3>Upload Your Photo</h3>
+            <p>Upload a photo of yourself with this cosplayer to claim this square!</p>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              accept="image/*"
+              style={{ display: 'none' }}
+            />
+
+            <div className="upload-buttons">
+              <button
+                className="upload-select-button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                {selectedFile ? 'Change Photo' : 'Select Photo'}
+              </button>
+
+              {selectedFile && (
+                <div className="selected-file-info">
+                  <p>Selected: {selectedFile.name}</p>
+                  <div className="upload-actions">
+                    <button
+                      className="upload-confirm-button"
+                      onClick={handleUpload}
+                      disabled={uploading}
+                    >
+                      {uploading ? 'Uploading...' : 'Upload & Claim'}
+                    </button>
+                    <button
+                      className="upload-cancel-button"
+                      onClick={() => {
+                        setShowUpload(false);
+                        setSelectedFile(null);
+                      }}
+                      disabled={uploading}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {showDetails && (
           <div
@@ -144,11 +248,11 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
               className="character-details-content"
               onClick={(e) => e.stopPropagation()} // Prevent clicks on content from closing
             >
-              <p><strong>Name:</strong><br />{character.Name}</p>
-              <p><strong>Source:</strong><br />{character.Source}</p>
-              <p><strong>Value:</strong><br />{getRarityValue(character.rarity)}</p>
-              <p><strong>What to look for:</strong><br />{character.description || "No description available"}</p>
-              <p><strong>Special conditions:</strong><br />{character.conditions || "None"}</p>
+              <p><strong style={{ color: getRarityColor(character.rarity) }}>Name:</strong><br />{character.Name}</p>
+              <p><strong style={{ color: getRarityColor(character.rarity) }}>Source:</strong><br />{character.Source}</p>
+              <p><strong style={{ color: getRarityColor(character.rarity) }}>Value:</strong><br />{getRarityValue(character.rarity)}</p>
+              <p><strong style={{ color: getRarityColor(character.rarity) }}>What to look for:</strong><br />{character.description || "No description available"}</p>
+              <p><strong style={{ color: getRarityColor(character.rarity) }}>Special conditions:</strong><br />{character.conditions || "None"}</p>
             </div>
           </div>
         )}
