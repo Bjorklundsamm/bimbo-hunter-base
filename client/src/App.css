@@ -17,7 +17,7 @@
 .app-container {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(to bottom right, #2c3e50, #000000);
+  background: linear-gradient(to bottom right, #1a1a1a, #000000);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -101,7 +101,7 @@
 .auth-button {
   font-family: 'Absender', sans-serif;
   padding: 0.75rem;
-  background-color: #4fc3f7;
+  background-color: #cc5500;
   color: white;
   border: none;
   border-radius: 4px;
@@ -113,7 +113,7 @@
 }
 
 .auth-button:hover {
-  background-color: #29b6f6;
+  background-color: #b84700;
 }
 
 .auth-button:disabled {
@@ -130,14 +130,14 @@
   font-family: 'Absender', sans-serif;
   background: none;
   border: none;
-  color: #4fc3f7;
+  color: #cc5500;
   font-size: 0.9rem;
   cursor: pointer;
   text-decoration: underline;
 }
 
 .toggle-button:hover {
-  color: #29b6f6;
+  color: #b84700;
 }
 
 .toggle-button:disabled {
@@ -240,15 +240,15 @@
 }
 
 .start-playing-button.enabled {
-  background-color: #4fc3f7;
+  background-color: #cc5500;
   color: white;
-  box-shadow: 0 4px 15px rgba(79, 195, 247, 0.3);
+  box-shadow: 0 4px 15px rgba(204, 85, 0, 0.3);
 }
 
 .start-playing-button.enabled:hover {
-  background-color: #29b6f6;
+  background-color: #b84700;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(79, 195, 247, 0.4);
+  box-shadow: 0 6px 20px rgba(204, 85, 0, 0.4);
 }
 
 .start-playing-button.disabled {
@@ -341,7 +341,7 @@
 }
 
 .view-board-button {
-  background-color: rgba(79, 195, 247, 0.2);
+  background-color: rgba(204, 85, 0, 0.2);
   color: white;
   border: none;
   border-radius: 4px;
@@ -352,7 +352,7 @@
 }
 
 .view-board-button:hover {
-  background-color: rgba(79, 195, 247, 0.3);
+  background-color: rgba(204, 85, 0, 0.3);
 }
 
 .no-users-message {
@@ -393,7 +393,7 @@
 
 .back-button {
   font-family: 'Absender', sans-serif;
-  background-color: rgba(79, 195, 247, 0.2);
+  background-color: rgba(204, 85, 0, 0.2);
   color: white;
   border: none;
   border-radius: 4px;
@@ -407,7 +407,7 @@
 }
 
 .back-button:hover {
-  background-color: rgba(79, 195, 247, 0.3);
+  background-color: rgba(204, 85, 0, 0.3);
 }
 
 /* Read-only styles */
@@ -498,12 +498,12 @@
 }
 
 .nav-item:hover {
-  color: #4fc3f7;
+  color: #cc5500;
   transform: translateY(-1px);
 }
 
 .nav-item.active {
-  color: #4fc3f7;
+  color: #cc5500;
   font-weight: bold;
 }
 
@@ -1740,28 +1740,24 @@
   margin-bottom: 2px;
 }
 
-/* Upload Interface Styles */
-.upload-interface {
-  background: rgba(0, 0, 0, 0.9);
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 20px;
+/* Upload Overlay Styles */
+.upload-overlay-content {
   text-align: center;
-  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.upload-interface h3 {
+.upload-title {
   color: #fff;
-  margin: 0 0 10px 0;
-  font-size: 1.2em;
+  margin: 0 0 15px 0;
+  font-size: 1.4em;
   font-family: 'Absender', sans-serif;
 }
 
-.upload-interface p {
+.upload-description {
   color: rgba(255, 255, 255, 0.8);
-  margin: 0 0 20px 0;
-  font-size: 0.9em;
+  margin: 0 0 25px 0;
+  font-size: 1.1em;
   font-family: 'vividly', sans-serif;
+  line-height: 1.4;
 }
 
 .upload-buttons {
@@ -1771,92 +1767,62 @@
   align-items: center;
 }
 
-.upload-select-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
+.upload-select-button,
+.upload-confirm-button,
+.upload-cancel-button {
+  min-width: 180px;
   padding: 12px 24px;
-  border-radius: 8px;
   font-size: 1em;
   font-family: 'Absender', sans-serif;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 150px;
+  color: white;
 }
 
-.upload-select-button:hover:not(:disabled) {
+.upload-select-button:hover:not(:disabled),
+.upload-confirm-button:hover:not(:disabled),
+.upload-cancel-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  filter: brightness(1.1);
 }
 
-.upload-select-button:disabled {
+.upload-select-button:disabled,
+.upload-confirm-button:disabled,
+.upload-cancel-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
 .selected-file-info {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   align-items: center;
+  width: 100%;
 }
 
 .selected-file-info p {
-  color: #4CAF50;
-  font-weight: bold;
-  margin: 0;
-  font-size: 0.9em;
+  font-family: 'Vividly', sans-serif;
+  margin-bottom: 2px;
+  line-height: 1.4;
+  font-size: 1.1em;
+}
+
+.selected-file-info p strong {
+  font-family: 'Absender', sans-serif;
+  font-size: 1.2em;
+  display: block;
+  margin-bottom: 2px;
 }
 
 .upload-actions {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   flex-wrap: wrap;
   justify-content: center;
-}
-
-.upload-confirm-button {
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-size: 0.9em;
-  font-family: 'Absender', sans-serif;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.upload-confirm-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
-}
-
-.upload-confirm-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.upload-cancel-button {
-  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-size: 0.9em;
-  font-family: 'Absender', sans-serif;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.upload-cancel-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
-}
-
-.upload-cancel-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 /* Mobile adjustments for portrait overlay */
@@ -1923,31 +1889,31 @@
     transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
   }
 
-  /* Upload interface mobile adjustments */
-  .upload-interface {
-    padding: 15px;
-    margin-top: 15px;
+  /* Upload overlay mobile adjustments */
+  .upload-title {
+    font-size: 1.2em;
   }
 
-  .upload-interface h3 {
-    font-size: 1.1em;
+  .upload-description {
+    font-size: 1em;
+    margin-bottom: 20px;
   }
 
-  .upload-interface p {
-    font-size: 0.85em;
+  .upload-buttons {
+    gap: 12px;
   }
 
   .upload-actions {
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
 
   .upload-select-button,
   .upload-confirm-button,
   .upload-cancel-button {
-    padding: 10px 16px;
+    padding: 10px 20px;
     font-size: 0.9em;
-    min-width: 120px;
+    min-width: 150px;
   }
 }
 

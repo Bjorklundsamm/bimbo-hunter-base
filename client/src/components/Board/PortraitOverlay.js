@@ -188,53 +188,94 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
           )}
         </div>
 
-        {/* Upload Interface */}
+        {/* Upload Interface Overlay */}
         {showUpload && !isReadOnly && (
-          <div className="upload-interface">
-            <h3>Upload Your Photo</h3>
-            <p>Upload a photo of yourself with this cosplayer to claim this square!</p>
+          <div
+            className="character-details-overlay"
+            onClick={() => {
+              setShowUpload(false);
+              setSelectedFile(null);
+            }}
+          >
+            <div
+              className="character-details-content upload-overlay-content"
+              onClick={(e) => e.stopPropagation()} // Prevent clicks on content from closing
+            >
+              <h3 className="upload-title">Upload Your Photo</h3>
+              <p className="upload-description">Upload a photo of yourself with this cosplayer to claim this square!</p>
 
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileSelect}
-              accept="image/*"
-              style={{ display: 'none' }}
-            />
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                accept="image/*"
+                style={{ display: 'none' }}
+              />
 
-            <div className="upload-buttons">
-              <button
-                className="upload-select-button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-              >
-                {selectedFile ? 'Change Photo' : 'Select Photo'}
-              </button>
+              <div className="upload-buttons">
+                <button
+                  className="details-button upload-select-button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  style={{
+                    backgroundColor: getRarityColor(character.rarity),
+                    boxShadow: `0 0 20px ${getRarityColor(character.rarity)}80, 0 4px 6px rgba(0, 0, 0, 0.1)`
+                  }}
+                >
+                  {selectedFile ? 'Change Photo' : 'Select Photo'}
+                </button>
 
-              {selectedFile && (
-                <div className="selected-file-info">
-                  <p>Selected: {selectedFile.name}</p>
-                  <div className="upload-actions">
-                    <button
-                      className="upload-confirm-button"
-                      onClick={handleUpload}
-                      disabled={uploading}
-                    >
-                      {uploading ? 'Uploading...' : 'Upload & Claim'}
-                    </button>
-                    <button
-                      className="upload-cancel-button"
-                      onClick={() => {
-                        setShowUpload(false);
-                        setSelectedFile(null);
-                      }}
-                      disabled={uploading}
-                    >
-                      Cancel
-                    </button>
+                {selectedFile && (
+                  <div className="selected-file-info">
+                    <p><strong style={{ color: getRarityColor(character.rarity) }}>Selected:</strong><br />{selectedFile.name}</p>
+                    <div className="upload-actions">
+                      <button
+                        className="details-button upload-confirm-button"
+                        onClick={handleUpload}
+                        disabled={uploading}
+                        style={{
+                          backgroundColor: '#4CAF50',
+                          boxShadow: '0 0 20px #4CAF5080, 0 4px 6px rgba(0, 0, 0, 0.1)'
+                        }}
+                      >
+                        {uploading ? 'Uploading...' : 'Upload & Claim'}
+                      </button>
+                      <button
+                        className="details-button upload-cancel-button"
+                        onClick={() => {
+                          setShowUpload(false);
+                          setSelectedFile(null);
+                        }}
+                        disabled={uploading}
+                        style={{
+                          backgroundColor: '#f44336',
+                          boxShadow: '0 0 20px #f4433680, 0 4px 6px rgba(0, 0, 0, 0.1)'
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+
+                {/* Cancel button always visible */}
+                {!selectedFile && (
+                  <button
+                    className="details-button upload-cancel-button"
+                    onClick={() => {
+                      setShowUpload(false);
+                      setSelectedFile(null);
+                    }}
+                    disabled={uploading}
+                    style={{
+                      backgroundColor: '#f44336',
+                      boxShadow: '0 0 20px #f4433680, 0 4px 6px rgba(0, 0, 0, 0.1)'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}

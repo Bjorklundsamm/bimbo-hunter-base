@@ -45,7 +45,7 @@ const HowToPlay = () => {
         <h1>How to Become a Licensed Bimbo Hunter</h1>
         <p className="wikihow-subtitle">A Complete Guide to Mastering the Art of Cosplay Hunting</p>
         <div className="wikihow-meta">
-          <span className="difficulty">Difficulty: Beginner</span>
+          <span className="difficulty">Difficulty: Master</span>
           <span className="time">Time Required: Convention Duration</span>
           <span className="steps">5 Steps</span>
         </div>

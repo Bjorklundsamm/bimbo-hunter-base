@@ -40,10 +40,9 @@ export const Rules = () => {
           <li>Cosplay is NOT consent - always ask for permission before taking photos.</li>
           <li>You must be featured in the photo (at least a hand) to claim a square.</li>
           <li>Teams can have as many members as you'd like, but there will still only be a single prize per team.</li>
-          <li>You can refresh to get a new board, but you will lose all your current progress.</li>
-          <li>Each player receives a unique bingo board with characters of different rarities.</li>
-          <li>Characters are ranked by rarity: FREE, R, SR, SSR, and UR+.</li>
-          <li>Higher rarity characters are worth more points, but are harder to find.</li>
+          <li>You can refresh to get a new board, but you will lose all your current progress. Please do not abuse this feature.</li>
+          <li>You cannot be a member of more than one team.</li>
+          <li>You may share a photo with someone who is not a member of your team, provided you are both featured in the photo.</li>
         </ol>
         <p>Good luck, and happy hunting!</p>
       </div>
@@ -60,7 +59,8 @@ const AppHeader = () => {
           <img src={`${process.env.PUBLIC_URL}/title-logo.png`} alt="Bimbo Hunter Logo" className="title-logo" />
         </div>
         <div className="thank-you-message">
-          <p>Thank you for competing in Official 2025 Bimbo Hunt!</p>
+          <p>Thank you for competing in the official 2025 Bimbo Hunt!</p>
+          <p>Please read the rules and how to play before you start.</p>
         </div>
       </div>
     </header>
