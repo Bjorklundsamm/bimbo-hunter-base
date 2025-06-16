@@ -78,7 +78,7 @@ export const UserProvider = ({ children }) => {
         // Save user data to state and local storage
         setUser(data.user);
         localStorage.setItem('user', JSON.stringify(data.user));
-        return { success: true };
+        return { success: true, user: data.user };
       } else {
         setError(data.error || 'Invalid PIN');
         return { success: false, error: data.error || 'Invalid PIN' };

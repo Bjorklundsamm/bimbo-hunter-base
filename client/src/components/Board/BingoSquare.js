@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BingoSquare = ({ character, isMarked, onClick, onPortraitClick, index, isReadOnly, userImage }) => {
+const BingoSquare = ({ character, isMarked, onPortraitClick, index, isReadOnly, userImage }) => {
   // Determine the border color based on rarity
   const getRarityColor = (rarity) => {
     switch (rarity) {
@@ -55,7 +55,7 @@ const BingoSquare = ({ character, isMarked, onClick, onPortraitClick, index, isR
 
   // Handle click on the thumbnail to show portrait
   const handleThumbnailClick = (e) => {
-    e.stopPropagation(); // Prevent the square's onClick from firing
+    // No need to stop propagation since we're removing the square's onClick handler
 
     // Get the position of the clicked thumbnail for zoom effect
     const rect = e.currentTarget.getBoundingClientRect();
@@ -80,12 +80,11 @@ const BingoSquare = ({ character, isMarked, onClick, onPortraitClick, index, isR
   return (
     <div
       className={`bingo-square ${isMarked ? 'marked' : ''} ${isFreeSquare ? 'free' : ''} ${isReadOnly ? 'read-only' : ''}`}
-      onClick={isReadOnly ? null : onClick}
       style={{
         borderColor: starColor,
         backgroundColor: 'transparent',
         position: 'relative',
-        cursor: isReadOnly ? 'default' : 'pointer'
+        cursor: 'default' // Border area is not clickable
       }}
     >
       <div className="thumbnail-container" onClick={handleThumbnailClick}>

@@ -142,35 +142,13 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
 
   // Handle confirm refresh
   const handleConfirmRefresh = () => {
-    // Reset state
-    setMarkedCells(new Set());
-    setUserImages({});
+    // Close any open overlays
     setSelectedCharacter(null);
     setSourcePosition(null);
     setShowRefreshConfirmation(false);
 
-    // Generate a new board
+    // Generate a new board (this will handle all state updates)
     fetchCharactersAndGenerateBoard();
-  };
-
-  // Handles clicking on a square to mark/unmark it
-  const handleSquareClick = (index) => {
-    if (isReadOnly) return; // Disable marking for read-only mode
-    
-    const character = characters[index];
-
-    // Cannot unmark the "FREE" space
-    if (character.rarity === 'FREE') {
-      return;
-    }
-
-    const newMarkedCells = new Set(markedCells);
-    if (newMarkedCells.has(index)) {
-      newMarkedCells.delete(index); // Unmark if already marked
-    } else {
-      newMarkedCells.add(index); // Mark if not marked
-    }
-    setMarkedCells(newMarkedCells);
   };
 
   // Handle clicking on a thumbnail to show the portrait
@@ -304,7 +282,6 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
             index={index}
             character={character}
             isMarked={markedCells.has(index)}
-            onClick={() => handleSquareClick(index)}
             onPortraitClick={handlePortraitClick}
             isReadOnly={isReadOnly}
             userImage={userImages[index]}
@@ -331,6 +308,7 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
           userId={userId}
           boardId={boardId}
           squareIndex={selectedCharacter.index}
+          userImage={userImages[selectedCharacter.index]}
         />
       )}
 

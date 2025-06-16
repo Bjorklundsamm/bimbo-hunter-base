@@ -10,6 +10,7 @@ import BoardViewer from './components/Board/BoardViewer';
 import Leaderboard from './components/Board/Leaderboard';
 import Cards from './components/Cards/Cards';
 import HowToPlay from './components/HowToPlay/HowToPlay';
+import AdminPanel from './components/Admin/AdminPanel';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -74,6 +75,22 @@ const Navigation = () => {
 
   // Only show navigation for logged-in users
   if (!user) return null;
+
+  // Different navigation for admin users
+  if (user.is_admin) {
+    return (
+      <nav className="main-navigation">
+        <div className="nav-container">
+          <Link
+            to="/admin"
+            className={`nav-item ${location.pathname === '/admin' ? 'active' : ''}`}
+          >
+            Admin Panel
+          </Link>
+        </div>
+      </nav>
+    );
+  }
 
   const navItems = [
     { path: '/dashboard', label: 'Your Board' },
@@ -167,6 +184,14 @@ const AppRoutes = () => {
             element={
               <ProtectedRoute>
                 <BoardViewer />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminPanel />
               </ProtectedRoute>
             }
           />

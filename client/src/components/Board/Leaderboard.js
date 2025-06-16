@@ -44,7 +44,15 @@ const Leaderboard = () => {
   // Find the maximum score for scaling
   const maxScore = Math.max(...sortedData.map(user => user.score || 0), 1); // Ensure we don't divide by zero
 
-  // Handle clicking on a user's score bar to view their board
+  // Truncate display name to max 16 characters
+  const truncateDisplayName = (displayName) => {
+    if (displayName.length <= 16) {
+      return displayName;
+    }
+    return displayName.substring(0, 16) + '...';
+  };
+
+  // Handle clicking on a leaderboard entry to view their board
   const handleViewUserBoard = (displayName) => {
     navigate(`/boards/${encodeURIComponent(displayName)}`);
   };
@@ -73,20 +81,20 @@ const Leaderboard = () => {
       <div className="leaderboard-container">
         {sortedData.length > 0 ? (
           sortedData.map((user, index) => (
-            <div key={index} className="leaderboard-entry">
+            <div
+              key={index}
+              className="leaderboard-entry"
+              onClick={() => handleViewUserBoard(user.display_name)}
+              title={`View ${user.display_name}'s board`}
+            >
               <div className="user-rank">{index + 1}</div>
-              <div className="user-name">{user.display_name}</div>
               <div
-                className="score-bar-container"
-                onClick={() => handleViewUserBoard(user.display_name)}
-                title={`View ${user.display_name}'s board`}
+                className="user-name"
+                title={user.display_name} // Show full name on hover
               >
-                <div
-                  className="score-bar"
-                  style={{ width: `${(user.score / maxScore) * 100}%` }}
-                ></div>
-                <span className="score-value">{user.score}</span>
+                {truncateDisplayName(user.display_name)}
               </div>
+              <div className="score-number">{user.score}</div>
             </div>
           ))
         ) : (

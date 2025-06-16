@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, jsonify, send_from_directory, request
+from flask import Flask, jsonify, send_from_directory, request, send_file
 import random
 import os
 import uuid
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # Initialize the database
 init_db()
 
-app = Flask(__name__, static_folder='resources')
+app = Flask(__name__, static_folder='client/build', static_url_path='')
 
 # Configuration for file uploads
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -40,9 +40,7 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
 
-@app.route('/')
-def hello_world():
-    return 'Bimbo Hunter API is running'
+# Root route is handled by the React app serving route at the bottom
 
 @app.route('/api/characters', methods=['GET'])
 def get_characters():
@@ -88,10 +86,23 @@ def login():
     if not pin:
         return jsonify({'error': 'PIN is required'}), 400
 
+    # Check for admin PIN
+    if pin == 'cardsagainsthumanity':
+        admin_user = {
+            'id': -1,
+            'pin': pin,
+            'display_name': 'Administrator',
+            'is_admin': True,
+            'created_at': None,
+            'last_login': None
+        }
+        return jsonify({'success': True, 'user': admin_user})
+
     # Get user by PIN
     user = User.get_by_pin(pin)
 
     if user:
+        user['is_admin'] = False
         return jsonify({'success': True, 'user': user})
     else:
         return jsonify({'error': 'Invalid PIN'}), 401
@@ -148,7 +159,9 @@ def create_user_board(user_id):
         free_index = next((i for i, char in enumerate(board_data) if char['rarity'] == 'FREE'), -1)
         if free_index != -1:
             marked_cells = [free_index]
-            Progress.create_or_update(user_id, new_board['id'], marked_cells)
+            # Calculate score for FREE square (1 point)
+            score = 1
+            Progress.create_or_update(user_id, new_board['id'], marked_cells, score)
 
         return jsonify(new_board)
     else:
@@ -198,8 +211,16 @@ def get_board_progress_by_display_name(display_name):
     if progress:
         return jsonify(progress)
     else:
-        # Initialize empty progress
-        new_progress = Progress.create_or_update(user['id'], board['id'], [], 0)
+        # Initialize progress with FREE space marked
+        board_data = board['board_data']
+        free_index = next((i for i, char in enumerate(board_data) if char['rarity'] == 'FREE'), -1)
+        if free_index != -1:
+            marked_cells = [free_index]
+            score = 1  # FREE square is worth 1 point
+            new_progress = Progress.create_or_update(user['id'], board['id'], marked_cells, score)
+        else:
+            # Fallback if no FREE square found
+            new_progress = Progress.create_or_update(user['id'], board['id'], [], 0)
         return jsonify(new_progress)
 
 # Progress Tracking Endpoints
@@ -212,8 +233,21 @@ def get_progress(user_id, board_id):
     if progress:
         return jsonify(progress)
     else:
-        # Initialize empty progress
-        new_progress = Progress.create_or_update(user_id, board_id, [], 0)
+        # Initialize progress with FREE space marked
+        board = Board.get_by_id(board_id)
+        if board:
+            board_data = board['board_data']
+            free_index = next((i for i, char in enumerate(board_data) if char['rarity'] == 'FREE'), -1)
+            if free_index != -1:
+                marked_cells = [free_index]
+                score = 1  # FREE square is worth 1 point
+                new_progress = Progress.create_or_update(user_id, board_id, marked_cells, score)
+            else:
+                # Fallback if no FREE square found
+                new_progress = Progress.create_or_update(user_id, board_id, [], 0)
+        else:
+            # Fallback if board not found
+            new_progress = Progress.create_or_update(user_id, board_id, [], 0)
         return jsonify(new_progress)
 
 @app.route('/api/users/<int:user_id>/boards/<int:board_id>/progress', methods=['POST'])
@@ -237,6 +271,249 @@ def get_leaderboard():
     """Get the leaderboard"""
     leaderboard = Progress.get_leaderboard()
     return jsonify(leaderboard)
+
+@app.route('/api/group-points', methods=['GET'])
+def get_group_points():
+    """Get the total group points (sum of all players' scores)"""
+    total_points = Progress.get_total_group_points()
+    return jsonify({'total_points': total_points})
+
+# Admin Endpoints
+
+@app.route('/api/admin/restart-server', methods=['POST'])
+def admin_restart_server():
+    """Restart the server (admin only)"""
+    import os
+    import sys
+
+    try:
+        # This will restart the server by exiting the current process
+        # The process manager (like systemd, supervisor, or manual restart) should restart it
+        logger.info("Admin requested server restart")
+        os.execv(sys.executable, ['python'] + sys.argv)
+        return jsonify({'success': True, 'message': 'Server restarting...'})
+    except Exception as e:
+        logger.error(f"Error restarting server: {e}")
+        return jsonify({'error': 'Failed to restart server'}), 500
+
+@app.route('/api/admin/delete-all-boards', methods=['DELETE'])
+def admin_delete_all_boards():
+    """Delete all boards and progress data (admin only)"""
+    try:
+        from database import get_db_connection
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        cursor = conn.cursor()
+
+        # Delete all progress first (due to foreign key constraints)
+        cursor.execute("DELETE FROM progress")
+        progress_deleted = cursor.rowcount
+
+        # Delete all boards
+        cursor.execute("DELETE FROM boards")
+        boards_deleted = cursor.rowcount
+
+        conn.commit()
+        conn.close()
+
+        logger.info(f"Admin deleted all boards: {boards_deleted} boards, {progress_deleted} progress records")
+        return jsonify({
+            'success': True,
+            'message': f'Deleted {boards_deleted} boards and {progress_deleted} progress records'
+        })
+
+    except Exception as e:
+        logger.error(f"Error deleting all boards: {e}")
+        return jsonify({'error': 'Failed to delete all boards'}), 500
+
+@app.route('/api/admin/delete-all-players', methods=['DELETE'])
+def admin_delete_all_players():
+    """Delete all players and their data (admin only)"""
+    try:
+        from database import get_db_connection
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        cursor = conn.cursor()
+
+        # Delete all progress first
+        cursor.execute("DELETE FROM progress")
+        progress_deleted = cursor.rowcount
+
+        # Delete all boards
+        cursor.execute("DELETE FROM boards")
+        boards_deleted = cursor.rowcount
+
+        # Delete all users
+        cursor.execute("DELETE FROM users")
+        users_deleted = cursor.rowcount
+
+        conn.commit()
+        conn.close()
+
+        logger.info(f"Admin deleted all players: {users_deleted} users, {boards_deleted} boards, {progress_deleted} progress records")
+        return jsonify({
+            'success': True,
+            'message': f'Deleted {users_deleted} players, {boards_deleted} boards, and {progress_deleted} progress records'
+        })
+
+    except Exception as e:
+        logger.error(f"Error deleting all players: {e}")
+        return jsonify({'error': 'Failed to delete all players'}), 500
+
+@app.route('/api/admin/delete-player/<int:user_id>', methods=['DELETE'])
+def admin_delete_player(user_id):
+    """Delete a specific player and their data (admin only)"""
+    try:
+        # Get user info first for logging
+        user = User.get_by_id(user_id)
+        if not user:
+            return jsonify({'error': 'Player not found'}), 404
+
+        from database import get_db_connection
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        cursor = conn.cursor()
+
+        # Delete progress for this user
+        cursor.execute("DELETE FROM progress WHERE user_id = ?", (user_id,))
+        progress_deleted = cursor.rowcount
+
+        # Delete boards for this user
+        cursor.execute("DELETE FROM boards WHERE user_id = ?", (user_id,))
+        boards_deleted = cursor.rowcount
+
+        # Delete the user
+        cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        user_deleted = cursor.rowcount
+
+        conn.commit()
+        conn.close()
+
+        if user_deleted > 0:
+            logger.info(f"Admin deleted player '{user['display_name']}' (ID: {user_id})")
+            return jsonify({
+                'success': True,
+                'message': f"Deleted player '{user['display_name']}' with {boards_deleted} boards and {progress_deleted} progress records"
+            })
+        else:
+            return jsonify({'error': 'Failed to delete player'}), 500
+
+    except Exception as e:
+        logger.error(f"Error deleting player {user_id}: {e}")
+        return jsonify({'error': 'Failed to delete player'}), 500
+
+@app.route('/api/admin/delete-board/<int:user_id>', methods=['DELETE'])
+def admin_delete_board(user_id):
+    """Delete a specific player's board (admin only)"""
+    try:
+        # Get user info first for logging
+        user = User.get_by_id(user_id)
+        if not user:
+            return jsonify({'error': 'Player not found'}), 404
+
+        from database import get_db_connection
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        cursor = conn.cursor()
+
+        # Delete progress for this user
+        cursor.execute("DELETE FROM progress WHERE user_id = ?", (user_id,))
+        progress_deleted = cursor.rowcount
+
+        # Delete boards for this user
+        cursor.execute("DELETE FROM boards WHERE user_id = ?", (user_id,))
+        boards_deleted = cursor.rowcount
+
+        conn.commit()
+        conn.close()
+
+        logger.info(f"Admin deleted board for player '{user['display_name']}' (ID: {user_id})")
+        return jsonify({
+            'success': True,
+            'message': f"Deleted {boards_deleted} boards and {progress_deleted} progress records for '{user['display_name']}'"
+        })
+
+    except Exception as e:
+        logger.error(f"Error deleting board for user {user_id}: {e}")
+        return jsonify({'error': 'Failed to delete board'}), 500
+
+@app.route('/api/admin/update-display-name/<int:user_id>', methods=['PUT'])
+def admin_update_display_name(user_id):
+    """Update a player's display name (admin only)"""
+    try:
+        data = request.json
+        new_display_name = data.get('display_name')
+
+        if not new_display_name:
+            return jsonify({'error': 'Display name is required'}), 400
+
+        # Get user info first
+        user = User.get_by_id(user_id)
+        if not user:
+            return jsonify({'error': 'Player not found'}), 404
+
+        # Update the display name
+        success = User.update_display_name(user_id, new_display_name)
+
+        if success:
+            logger.info(f"Admin updated display name for user {user_id} from '{user['display_name']}' to '{new_display_name}'")
+            return jsonify({
+                'success': True,
+                'message': f"Updated display name from '{user['display_name']}' to '{new_display_name}'"
+            })
+        else:
+            return jsonify({'error': 'Failed to update display name or name already taken'}), 400
+
+    except Exception as e:
+        logger.error(f"Error updating display name for user {user_id}: {e}")
+        return jsonify({'error': 'Failed to update display name'}), 500
+
+@app.route('/api/admin/boards', methods=['GET'])
+def admin_get_all_boards():
+    """Get all boards with user info (admin only)"""
+    try:
+        boards = Board.get_all_with_users()
+        return jsonify(boards)
+
+    except Exception as e:
+        logger.error(f"Error getting all boards: {e}")
+        return jsonify({'error': 'Failed to get boards'}), 500
+
+@app.route('/api/admin/boards/<int:user_id>/progress', methods=['PUT'])
+def admin_update_board_progress(user_id):
+    """Update a player's board progress (admin only)"""
+    try:
+        data = request.json
+        marked_cells = data.get('marked_cells', [])
+        user_images = data.get('user_images', {})
+        score = data.get('score', 0)
+
+        # Get the user's board
+        board = Board.get_by_user(user_id)
+        if not board:
+            return jsonify({'error': 'No board found for this user'}), 404
+
+        # Update progress
+        progress = Progress.create_or_update(user_id, board['id'], marked_cells, score, user_images)
+
+        if progress:
+            user = User.get_by_id(user_id)
+            logger.info(f"Admin updated board progress for '{user['display_name'] if user else 'Unknown'}' (ID: {user_id})")
+            return jsonify(progress)
+        else:
+            return jsonify({'error': 'Failed to update progress'}), 500
+
+    except Exception as e:
+        logger.error(f"Error updating board progress for user {user_id}: {e}")
+        return jsonify({'error': 'Failed to update board progress'}), 500
 
 # File Upload Endpoints
 
@@ -291,5 +568,55 @@ def serve_resources(path):
     # Serve the file from the resources directory
     return send_from_directory('resources', path)
 
+# Production build serving routes
+@app.route('/static/<path:path>')
+def serve_static(path):
+    """Serve static files from React build"""
+    return send_from_directory('client/build/static', path)
+
+@app.route('/user-images/<path:path>')
+def serve_user_images(path):
+    """Serve user uploaded images"""
+    return send_from_directory('client/public/user-images', path)
+
+@app.route('/thumbnails/<path:path>')
+def serve_thumbnails(path):
+    """Serve thumbnail images from build"""
+    return send_from_directory('client/build/thumbnails', path)
+
+@app.route('/Portraits/<path:path>')
+def serve_portraits(path):
+    """Serve portrait images from build"""
+    return send_from_directory('client/build/Portraits', path)
+
+@app.route('/frames/<path:path>')
+def serve_frames(path):
+    """Serve frame images from build"""
+    return send_from_directory('client/build/frames', path)
+
+@app.route('/How To/<path:path>')
+def serve_how_to(path):
+    """Serve how-to images from build"""
+    return send_from_directory('client/build/How To', path)
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react_app(path):
+    """Serve React app for all non-API routes"""
+    # If it's an API route, let Flask handle it normally
+    if path.startswith('api/'):
+        return jsonify({'error': 'API endpoint not found'}), 404
+
+    # For all other routes, serve the React app
+    try:
+        return send_from_directory('client/build', 'index.html')
+    except Exception as e:
+        logger.error(f"Error serving React app: {e}")
+        return jsonify({'error': 'Failed to serve application'}), 500
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    print("Starting Bimbo Hunter production server...")
+    print("Build directory exists:", os.path.exists('client/build'))
+    print("Index.html exists:", os.path.exists('client/build/index.html'))
+    print("Server will be available at: http://localhost:5000")
+    app.run(debug=False, host='0.0.0.0', port=5000)

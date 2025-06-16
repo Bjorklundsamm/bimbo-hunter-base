@@ -166,6 +166,113 @@ class User:
         finally:
             conn.close()
 
+    @staticmethod
+    def get_by_id(user_id):
+        """
+        Get a user by ID.
+
+        Args:
+            user_id (int): User's ID
+
+        Returns:
+            dict: User data if found, None otherwise
+        """
+        conn = get_db_connection()
+        if conn is None:
+            return None
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+            user = cursor.fetchone()
+
+            return dict(user) if user else None
+
+        except Error as e:
+            logger.error(f"Error getting user by ID: {e}")
+            return None
+        finally:
+            conn.close()
+
+    @staticmethod
+    def update_display_name(user_id, new_display_name):
+        """
+        Update a user's display name.
+
+        Args:
+            user_id (int): User's ID
+            new_display_name (str): New display name
+
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        conn = get_db_connection()
+        if conn is None:
+            return False
+
+        try:
+            cursor = conn.cursor()
+
+            # Check if display name is already taken (case-insensitive)
+            cursor.execute("SELECT * FROM users WHERE LOWER(display_name) = LOWER(?) AND id != ?", (new_display_name, user_id))
+            existing_display_name = cursor.fetchone()
+
+            if existing_display_name:
+                logger.warning(f"Display name '{new_display_name}' is already taken (case-insensitive)")
+                return False
+
+            # Update the display name
+            cursor.execute(
+                "UPDATE users SET display_name = ? WHERE id = ?",
+                (new_display_name, user_id)
+            )
+            conn.commit()
+
+            return cursor.rowcount > 0
+
+        except Error as e:
+            logger.error(f"Error updating display name: {e}")
+            return False
+        finally:
+            conn.close()
+
+    @staticmethod
+    def delete_by_id(user_id):
+        """
+        Delete a user by ID.
+
+        Args:
+            user_id (int): User's ID
+
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        conn = get_db_connection()
+        if conn is None:
+            return False
+
+        try:
+            cursor = conn.cursor()
+
+            # Delete progress first (due to foreign key constraints)
+            cursor.execute("DELETE FROM progress WHERE user_id = ?", (user_id,))
+
+            # Delete boards for this user
+            cursor.execute("DELETE FROM boards WHERE user_id = ?", (user_id,))
+
+            # Delete the user
+            cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
+
+            conn.commit()
+
+            return cursor.rowcount > 0
+
+        except Error as e:
+            logger.error(f"Error deleting user: {e}")
+            return False
+        finally:
+            conn.close()
+
 
 class Board:
     """Board model for bingo board management."""
@@ -323,6 +430,45 @@ class Board:
         finally:
             conn.close()
 
+    @staticmethod
+    def get_all_with_users():
+        """
+        Get all boards with their associated user information.
+
+        Returns:
+            list: List of board dictionaries with user info
+        """
+        conn = get_db_connection()
+        if conn is None:
+            return []
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT b.*, u.display_name, u.pin
+                FROM boards b
+                JOIN users u ON b.user_id = u.id
+                ORDER BY u.display_name
+                """
+            )
+            boards = cursor.fetchall()
+
+            result = []
+            for board in boards:
+                board_dict = dict(board)
+                # Parse the JSON string back to a list
+                board_dict['board_data'] = json.loads(board_dict['board_data'])
+                result.append(board_dict)
+
+            return result
+
+        except Error as e:
+            logger.error(f"Error getting all boards with users: {e}")
+            return []
+        finally:
+            conn.close()
+
 
 class Progress:
     """Progress model for tracking user progress on boards."""
@@ -474,5 +620,35 @@ class Progress:
         except Error as e:
             logger.error(f"Error getting leaderboard: {e}")
             return []
+        finally:
+            conn.close()
+
+    @staticmethod
+    def get_total_group_points():
+        """
+        Get the total group points (sum of all players' scores).
+
+        Returns:
+            int: Total points across all players
+        """
+        conn = get_db_connection()
+        if conn is None:
+            return 0
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT COALESCE(SUM(p.score), 0) as total_points
+                FROM progress p
+                """
+            )
+            result = cursor.fetchone()
+
+            return result['total_points'] if result else 0
+
+        except Error as e:
+            logger.error(f"Error getting total group points: {e}")
+            return 0
         finally:
             conn.close()
