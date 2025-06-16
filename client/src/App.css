@@ -590,11 +590,7 @@
   filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.7)); /* Add shadow for better visibility */
 }
 
-.bingo-square:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transform: scale(1.01); /* Further reduced scale effect to avoid overlap */
-  z-index: 10;
-}
+/* Removed bingo-square:hover since borders are no longer clickable */
 
 .bingo-square.marked {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -635,14 +631,21 @@
   font-size: min(70%, 3.5rem); /* Increased font size */
 }
 
+/* Points Section Wrapper */
+.points-section-wrapper {
+  margin-top: min(4vh, 1.5rem);
+  width: min(95%, 800px); /* Use 95% of container width but cap at 800px */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 /* Points and Controls Container */
 .points-controls-container {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 1.5rem; /* Increased gap for more spacing between meter and score */
-  margin-top: min(4vh, 1.5rem);
-  width: min(95%, 800px); /* Use 95% of container width but cap at 800px */
   position: relative;
 }
 
@@ -737,17 +740,17 @@
   line-height: 1; /* Tighter line height */
 }
 
-.milestone {
+/* Milestone markers (without tooltips) */
+.milestone-marker {
   position: absolute;
   bottom: 0;
   transform: translateX(-50%);
   width: 2px;
   height: 100px; /* Match the height of the progress bar */
   z-index: 10;
-  cursor: pointer;
 }
 
-.milestone::before {
+.milestone-marker::before {
   content: '';
   position: absolute;
   bottom: 0;
@@ -757,42 +760,6 @@
   background-color: white; /* White notch for visibility */
   z-index: 10;
   pointer-events: none;
-}
-
-.milestone-tooltip {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #2c3e50;
-  color: white;
-  padding: 10px 15px;
-  border-radius: 5px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-  width: max-content;
-  max-width: 200px;
-  text-align: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-  z-index: 20;
-}
-
-.milestone-tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 8px;
-  border-style: solid;
-  border-color: #2c3e50 transparent transparent transparent;
-}
-
-.milestone:hover .milestone-tooltip {
-  opacity: 1;
-  visibility: visible;
-  bottom: 45px;
 }
 
 .milestone-value {
@@ -807,6 +774,28 @@
   pointer-events: none;
   width: max-content;
   text-align: center;
+}
+
+/* Next Reward Section */
+.next-reward-section {
+  text-align: center;
+  color: white;
+}
+
+.next-reward-label {
+  font-family: 'Absender', sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.next-reward-text {
+  font-family: 'Vividly', sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #4fc3f7;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* Refresh Button */
@@ -1022,11 +1011,13 @@
 .leaderboard-entry {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
   padding: 0.5rem;
   background-color: rgba(0, 0, 0, 0.2);
   border-radius: 0.5rem;
   transition: transform 0.2s ease;
+  cursor: pointer;
 }
 
 .leaderboard-entry:hover {
@@ -1047,41 +1038,23 @@
 }
 
 .user-name {
-  width: 6rem;
+  flex: 1;
   font-weight: bold;
   font-size: 1.1rem;
-}
-
-.score-bar-container {
-  flex: 1;
-  height: 2rem;
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 1rem;
-  position: relative;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  cursor: pointer; /* Make it clickable */
-  transition: background-color 0.2s ease;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.score-bar-container:hover {
-  background-color: rgba(0, 0, 0, 0.4); /* Darker on hover */
-}
 
-.score-bar {
-  height: 100%;
-  background: white;
-  border-radius: 1rem;
-  transition: width 0.5s ease-out;
-}
 
-.score-bar-container .score-value {
-  position: absolute;
-  right: 1rem;
+.score-number {
+  width: 3rem;
+  text-align: right;
   font-weight: bold;
+  font-size: 1.1rem;
   color: white;
-  mix-blend-mode: difference; /* Creates negative color effect like the progress meter */
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 /* Rules Section */
@@ -1599,6 +1572,16 @@
   display: block;
 }
 
+.user-uploaded-portrait {
+  /* Scale to match the height of normal portraits */
+  height: 80vh;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  display: block;
+}
+
 .portrait-frame-overlay {
   position: absolute;
   top: 0;
@@ -2046,12 +2029,12 @@
     font-size: 2rem; /* Bigger font size on mobile portrait but still fits */
   }
 
-  .milestone {
+  .milestone-marker {
     bottom: 0;
     height: 90px;
   }
 
-  .milestone::before {
+  .milestone-marker::before {
     height: 10px;
   }
 
@@ -2077,12 +2060,13 @@
   }
 
   .user-name {
-    width: 5rem;
+    flex: 1;
     font-size: 1rem;
   }
 
-  .score-bar-container {
-    height: 1.5rem;
+  .score-number {
+    width: 2.5rem;
+    font-size: 1rem;
   }
 }
 
@@ -2164,12 +2148,12 @@
     font-size: 1.8rem; /* Bigger font size on mobile landscape but still fits */
   }
 
-  .milestone {
+  .milestone-marker {
     bottom: 0;
     height: 80px;
   }
 
-  .milestone::before {
+  .milestone-marker::before {
     height: 10px;
   }
 
@@ -2199,12 +2183,13 @@
   }
 
   .user-name {
-    width: 4rem;
+    flex: 1;
     font-size: 0.9rem;
   }
 
-  .score-bar-container {
-    height: 1.5rem;
+  .score-number {
+    width: 2rem;
+    font-size: 0.9rem;
   }
 }
 

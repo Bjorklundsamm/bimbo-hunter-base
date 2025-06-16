@@ -45,6 +45,12 @@ const Login = () => {
       const result = await login(pin);
 
       if (result.success) {
+        // Check if user is admin
+        if (result.user && result.user.is_admin) {
+          navigate('/admin');
+          return;
+        }
+
         // Check if user has a board and redirect accordingly
         try {
           const boardResponse = await fetch(`http://localhost:5000/api/users/${result.user?.id || JSON.parse(localStorage.getItem('user')).id}/board`, {

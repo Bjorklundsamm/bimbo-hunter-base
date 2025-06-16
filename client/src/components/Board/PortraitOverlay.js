@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaimed, isReadOnly, userId, boardId, squareIndex }) => {
+const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaimed, isReadOnly, userId, boardId, squareIndex, userImage }) => {
   // Get the portrait URL from the portrait path
   const getPortraitUrl = (portraitPath) => {
     if (!portraitPath) return null;
     return `${process.env.PUBLIC_URL}${portraitPath}`;
   };
 
-  const portraitUrl = getPortraitUrl(character.Portrait);
+  // Use user image if available and claimed, otherwise use original portrait
+  const portraitUrl = (isClaimed && userImage)
+    ? `${process.env.PUBLIC_URL}${userImage}`
+    : getPortraitUrl(character.Portrait);
 
   // Get the frame overlay URL based on character rarity
   const getFrameOverlayUrl = (rarity) => {
@@ -15,7 +18,8 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
     return `${process.env.PUBLIC_URL}/frames/${rarity} - Portrait.png`;
   };
 
-  const frameOverlayUrl = getFrameOverlayUrl(character.rarity);
+  // Only show frame overlay for character portraits, not user images
+  const frameOverlayUrl = (isClaimed && userImage) ? null : getFrameOverlayUrl(character.rarity);
 
   // Use state to control animation classes and details visibility
   const [isVisible, setIsVisible] = useState(false);
@@ -155,7 +159,7 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
           <img
             src={portraitUrl}
             alt={character.Name}
-            className="character-portrait"
+            className={`${(isClaimed && userImage) ? 'user-uploaded-portrait' : 'character-portrait'}`}
           />
           {frameOverlayUrl && (
             <img

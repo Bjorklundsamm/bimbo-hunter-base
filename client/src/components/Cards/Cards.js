@@ -67,14 +67,14 @@ const Cards = () => {
     return groups;
   }, {});
 
-  // Define rarity order and colors
+  // Define rarity order and colors (matching the official rarity colors used in BingoSquare)
   const rarityOrder = ['FREE', 'R', 'SR', 'SSR', 'UR+'];
   const rarityColors = {
-    'FREE': '#4fc3f7',
-    'R': '#81c784',
-    'SR': '#ffb74d',
-    'SSR': '#e57373',
-    'UR+': '#ba68c8'
+    'FREE': '#4CAF50', // Green
+    'R': '#2196F3',    // Blue
+    'SR': '#9C27B0',   // Purple
+    'SSR': '#FF9800',  // Orange
+    'UR+': '#F44336'   // Red
   };
 
   return (

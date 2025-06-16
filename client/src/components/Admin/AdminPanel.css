@@ -1,0 +1,360 @@
+.admin-panel {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: linear-gradient(135deg, #2c2c2c 0%, #000000 100%);
+  min-height: 100vh;
+  color: white;
+}
+
+.admin-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  border-bottom: 2px solid #444;
+}
+
+.admin-header h1 {
+  font-family: 'Absender', sans-serif;
+  font-size: 2.5rem;
+  margin: 0 0 10px 0;
+  color: #ff6b35;
+}
+
+.admin-header-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-header-info p {
+  font-family: 'vividly', sans-serif;
+  font-size: 1.2rem;
+  margin: 0;
+  color: #ccc;
+}
+
+.admin-message {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.admin-message.success {
+  background-color: #4caf50;
+  color: white;
+}
+
+.admin-message.error {
+  background-color: #f44336;
+  color: white;
+}
+
+.admin-error {
+  text-align: center;
+  padding: 50px;
+  font-size: 1.5rem;
+  color: #f44336;
+  background: linear-gradient(135deg, #2c2c2c 0%, #000000 100%);
+  min-height: 100vh;
+}
+
+.admin-sections {
+  display: grid;
+  gap: 30px;
+}
+
+.admin-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 25px;
+  border: 1px solid #444;
+}
+
+.admin-section h2 {
+  font-family: 'Absender', sans-serif;
+  font-size: 1.8rem;
+  margin: 0 0 20px 0;
+  color: #ff6b35;
+  border-bottom: 1px solid #555;
+  padding-bottom: 10px;
+}
+
+.admin-button {
+  background: #ff6b35;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: 'Absender', sans-serif;
+  font-size: 1rem;
+  margin: 5px;
+  transition: all 0.3s ease;
+}
+
+.admin-button:hover {
+  background: #e55a2b;
+  transform: translateY(-2px);
+}
+
+.admin-button:disabled {
+  background: #666;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.admin-button.danger {
+  background: #f44336;
+}
+
+.admin-button.danger:hover {
+  background: #d32f2f;
+}
+
+.admin-button.secondary {
+  background: #666;
+}
+
+.admin-button.secondary:hover {
+  background: #555;
+}
+
+.admin-button.small {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+.player-list {
+  display: grid;
+  gap: 15px;
+}
+
+.player-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #555;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.player-name {
+  font-family: 'Absender', sans-serif;
+  font-size: 1.2rem;
+  color: #ff6b35;
+}
+
+.player-pin {
+  font-family: 'vividly', sans-serif;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.player-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.edit-name-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.edit-name-form input {
+  padding: 8px 12px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-family: 'vividly', sans-serif;
+  min-width: 150px;
+}
+
+.edit-name-form input:focus {
+  outline: none;
+  border-color: #ff6b35;
+}
+
+.board-list {
+  display: grid;
+  gap: 15px;
+}
+
+.board-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #555;
+}
+
+.board-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.board-player {
+  font-family: 'Absender', sans-serif;
+  font-size: 1.2rem;
+  color: #ff6b35;
+}
+
+.board-created {
+  font-family: 'vividly', sans-serif;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.board-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  max-width: 400px;
+  margin: 20px 0;
+}
+
+.board-square {
+  aspect-ratio: 1;
+  border: 2px solid #555;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.board-square:hover {
+  border-color: #ff6b35;
+}
+
+.board-square.claimed {
+  background: rgba(76, 175, 80, 0.3);
+  border-color: #4caf50;
+}
+
+.board-square.free {
+  background: rgba(255, 107, 53, 0.3);
+  border-color: #ff6b35;
+  font-weight: bold;
+}
+
+.board-editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.board-editor {
+  background: linear-gradient(135deg, #2c2c2c 0%, #000000 100%);
+  border-radius: 10px;
+  padding: 30px;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 2px solid #ff6b35;
+}
+
+.board-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #555;
+}
+
+.board-editor-header h3 {
+  font-family: 'Absender', sans-serif;
+  color: #ff6b35;
+  margin: 0;
+}
+
+.board-editor-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.board-stats {
+  text-align: center;
+  font-family: 'vividly', sans-serif;
+}
+
+.board-stats p {
+  margin: 5px 0;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .admin-panel {
+    padding: 10px;
+  }
+
+  .player-item,
+  .board-item {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .player-actions,
+  .board-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .edit-name-form {
+    width: 100%;
+  }
+
+  .edit-name-form input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .board-editor {
+    margin: 20px;
+    max-width: calc(100vw - 40px);
+  }
+
+  .board-grid {
+    max-width: 300px;
+  }
+}

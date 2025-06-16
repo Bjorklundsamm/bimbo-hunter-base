@@ -6,7 +6,9 @@
   "scripts": {
     "start-backend": "python app.py",
     "start-frontend": "cd client && npm start",
-    "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
+    "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\"",
+    "build": "cd client && npm run build",
+    "start-production": "python app.py"
   },
   "dependencies": {
     "concurrently": "^8.2.2"
