@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { getApiUrl } from '../../config/api';
 
 // Create the user context
 const UserContext = createContext();
@@ -17,40 +18,52 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const checkUserSession = async () => {
       try {
+        console.log('UserContext: Checking user session...');
         // Check if user data exists in local storage
         const storedUser = localStorage.getItem('user');
-        
+        console.log('UserContext: Stored user:', storedUser);
+
         if (storedUser) {
           const userData = JSON.parse(storedUser);
-          
+          console.log('UserContext: Parsed user data:', userData);
+
           // Verify the user still exists in the database
-          const response = await fetch(`http://localhost:5000/api/auth/login`, {
+          const response = await fetch(getApiUrl('/api/auth/login'), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ pin: userData.pin }),
           });
-          
+
+          console.log('UserContext: Login verification response:', response.status);
+
           if (response.ok) {
             const data = await response.json();
+            console.log('UserContext: Login verification data:', data);
             if (data.success) {
               setUser(data.user);
+              console.log('UserContext: User set successfully');
             } else {
               // Clear invalid session
               localStorage.removeItem('user');
               setUser(null);
+              console.log('UserContext: Invalid session cleared');
             }
           } else {
             // Clear invalid session
             localStorage.removeItem('user');
             setUser(null);
+            console.log('UserContext: Invalid session cleared (bad response)');
           }
+        } else {
+          console.log('UserContext: No stored user found');
         }
       } catch (err) {
         console.error('Error checking user session:', err);
         setError('Failed to restore user session');
       } finally {
+        console.log('UserContext: Setting loading to false');
         setLoading(false);
       }
     };
@@ -64,7 +77,7 @@ export const UserProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(getApiUrl('/api/auth/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +111,7 @@ export const UserProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(getApiUrl('/api/auth/register'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

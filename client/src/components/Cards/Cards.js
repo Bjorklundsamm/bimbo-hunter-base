@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getApiUrl } from '../../config/api';
 import PortraitOverlay from '../Board/PortraitOverlay';
 
 const Cards = () => {
@@ -12,7 +13,7 @@ const Cards = () => {
     const fetchCharacters = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/characters');
+        const response = await fetch(getApiUrl('/api/characters'));
         
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);

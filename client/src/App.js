@@ -16,17 +16,22 @@ import AdminPanel from './components/Admin/AdminPanel';
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useUser();
 
+  console.log('ProtectedRoute: loading =', loading, 'user =', user);
+
   // If still loading, show loading indicator
   if (loading) {
+    console.log('ProtectedRoute: Showing loading...');
     return <div className="loading-message">Loading...</div>;
   }
 
   // If not logged in, redirect to login page
   if (!user) {
+    console.log('ProtectedRoute: No user, redirecting to login');
     return <Navigate to="/" replace />;
   }
 
   // If logged in, render the protected component
+  console.log('ProtectedRoute: User authenticated, rendering children');
   return children;
 };
 

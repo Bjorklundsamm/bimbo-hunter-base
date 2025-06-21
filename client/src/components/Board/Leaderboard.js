@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getApiUrl } from '../../config/api';
 
 const Leaderboard = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const Leaderboard = () => {
       try {
         setLoading(true);
 
-        const response = await fetch('http://localhost:5000/api/leaderboard');
+        const response = await fetch(getApiUrl('/api/leaderboard'));
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);

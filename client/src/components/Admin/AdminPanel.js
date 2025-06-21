@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useUser } from '../Auth/UserContext';
+import { getApiUrl } from '../../config/api';
 import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
 
@@ -42,7 +43,7 @@ const AdminPanel = () => {
 
   const fetchPlayers = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/users');
+      const response = await fetch(getApiUrl('/api/users'));
       if (response.ok) {
         const data = await response.json();
         setPlayers(data);
@@ -54,7 +55,7 @@ const AdminPanel = () => {
 
   const fetchBoards = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/admin/boards');
+      const response = await fetch(getApiUrl('/api/admin/boards'));
       if (response.ok) {
         const data = await response.json();
         setBoards(data);
@@ -71,7 +72,7 @@ const AdminPanel = () => {
     
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/admin/restart-server', {
+      const response = await fetch(getApiUrl('/api/admin/restart-server'), {
         method: 'POST',
       });
       
@@ -93,7 +94,7 @@ const AdminPanel = () => {
     
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/admin/delete-all-boards', {
+      const response = await fetch(getApiUrl('/api/admin/delete-all-boards'), {
         method: 'DELETE',
       });
       
@@ -117,7 +118,7 @@ const AdminPanel = () => {
     
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/admin/delete-all-players', {
+      const response = await fetch(getApiUrl('/api/admin/delete-all-players'), {
         method: 'DELETE',
       });
       
@@ -142,7 +143,7 @@ const AdminPanel = () => {
     
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/delete-player/${playerId}`, {
+      const response = await fetch(getApiUrl(`/api/admin/delete-player/${playerId}`), {
         method: 'DELETE',
       });
       
@@ -167,7 +168,7 @@ const AdminPanel = () => {
     
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/delete-board/${userId}`, {
+      const response = await fetch(getApiUrl(`/api/admin/delete-board/${userId}`), {
         method: 'DELETE',
       });
       
@@ -192,7 +193,7 @@ const AdminPanel = () => {
     
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/update-display-name/${userId}`, {
+      const response = await fetch(getApiUrl(`/api/admin/update-display-name/${userId}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -389,7 +390,7 @@ const BoardEditor = ({ board, onClose, onUpdate }) => {
 
   const fetchBoardProgress = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/boards/${encodeURIComponent(board.display_name)}/progress`);
+      const response = await fetch(getApiUrl(`/api/boards/${encodeURIComponent(board.display_name)}/progress`));
       if (response.ok) {
         const data = await response.json();
         setBoardProgress(data);
@@ -441,7 +442,7 @@ const BoardEditor = ({ board, onClose, onUpdate }) => {
       const completedLines = checkCompletedLines(markedCells);
       newScore += completedLines * 5;
 
-      const response = await fetch(`http://localhost:5000/api/admin/boards/${board.user_id}/progress`, {
+      const response = await fetch(getApiUrl(`/api/admin/boards/${board.user_id}/progress`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

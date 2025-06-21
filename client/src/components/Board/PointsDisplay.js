@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getApiUrl } from '../../config/api';
 
 const PointsDisplay = ({ characters, markedCells, onRefreshClick, isReadOnly, score }) => {
   const [groupPoints, setGroupPoints] = useState(0);
@@ -7,7 +8,7 @@ const PointsDisplay = ({ characters, markedCells, onRefreshClick, isReadOnly, sc
   useEffect(() => {
     const fetchGroupPoints = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/group-points');
+        const response = await fetch(getApiUrl('/api/group-points'));
         if (response.ok) {
           const data = await response.json();
           setGroupPoints(data.total_points);
@@ -29,7 +30,7 @@ const PointsDisplay = ({ characters, markedCells, onRefreshClick, isReadOnly, sc
   useEffect(() => {
     const fetchGroupPoints = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/group-points');
+        const response = await fetch(getApiUrl('/api/group-points'));
         if (response.ok) {
           const data = await response.json();
           setGroupPoints(data.total_points);

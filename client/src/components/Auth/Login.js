@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useUser } from './UserContext';
 import { useNavigate } from 'react-router-dom';
+import { getApiUrl } from '../../config/api';
 
 const Login = () => {
   // State for form inputs
@@ -53,7 +54,7 @@ const Login = () => {
 
         // Check if user has a board and redirect accordingly
         try {
-          const boardResponse = await fetch(`http://localhost:5000/api/users/${result.user?.id || JSON.parse(localStorage.getItem('user')).id}/board`, {
+          const boardResponse = await fetch(getApiUrl(`/api/users/${result.user?.id || JSON.parse(localStorage.getItem('user')).id}/board`), {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

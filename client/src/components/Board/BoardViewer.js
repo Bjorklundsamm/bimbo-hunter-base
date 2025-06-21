@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../Auth/UserContext';
+import { getApiUrl } from '../../config/api';
 
 // Import components from App.js (we'll extract these later)
 import BingoBoard from './BingoBoard';
@@ -32,7 +33,7 @@ const BoardViewer = () => {
         setLoading(true);
 
         // Fetch the user's board by display name
-        const boardResponse = await fetch(`http://localhost:5000/api/boards/${encodeURIComponent(displayName)}`);
+        const boardResponse = await fetch(getApiUrl(`/api/boards/${encodeURIComponent(displayName)}`));
 
         if (!boardResponse.ok) {
           if (boardResponse.status === 404) {
@@ -46,7 +47,7 @@ const BoardViewer = () => {
         setBoardOwner(boardData.user);
 
         // Fetch the board progress
-        const progressResponse = await fetch(`http://localhost:5000/api/boards/${encodeURIComponent(displayName)}/progress`);
+        const progressResponse = await fetch(getApiUrl(`/api/boards/${encodeURIComponent(displayName)}/progress`));
 
         if (!progressResponse.ok) {
           throw new Error(`HTTP error! Status: ${progressResponse.status}`);

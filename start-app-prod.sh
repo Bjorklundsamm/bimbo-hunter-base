@@ -107,41 +107,20 @@ if ! kill -0 $BACKEND_PID 2>/dev/null; then
 fi
 echo "✅ Backend started successfully (PID: $BACKEND_PID)"
 
-# Start Paimon Discord bot (if configured)
-if [ "$SKIP_PAIMON" = false ]; then
-    echo "🤖 Starting Paimon Discord bot..."
-    (cd "p(ai)mon" && python paimon.py) &
-    PAIMON_PID=$!
-    
-    # Wait for Paimon to start
-    sleep 3
-    
-    # Check if Paimon started successfully
-    if ! kill -0 $PAIMON_PID 2>/dev/null; then
-        echo "⚠️  Paimon failed to start (check configuration)."
-        PAIMON_PID=""
-    else
-        echo "✅ Paimon started successfully (PID: $PAIMON_PID)"
-    fi
-else
-    echo "⏭️  Skipping Paimon (not configured)."
-    PAIMON_PID=""
-fi
+# Temporarily skip Paimon startup
+echo "⏭️  Skipping Paimon startup (temporarily disabled)."
+PAIMON_PID=""
 
 echo
 echo "🎉 Production environment is now running!"
 echo "========================================"
 echo "📍 Application URL: http://localhost:5000"
 echo "🖥️  Backend API: http://localhost:5000/api"
-echo "🤖 Paimon: $([ "$SKIP_PAIMON" = false ] && echo "Running" || echo "Not configured")"
+echo "🤖 Paimon: Temporarily disabled"
 echo
 echo "📊 Services Status:"
 echo "   ✅ Backend (PID: $BACKEND_PID)"
-if [ -n "$PAIMON_PID" ]; then
-    echo "   ✅ Paimon (PID: $PAIMON_PID)"
-else
-    echo "   ⏭️  Paimon (skipped)"
-fi
+echo "   ⏭️  Paimon (temporarily disabled)"
 echo
 echo "📝 Logs:"
 echo "   Backend: Check terminal output above"
@@ -150,9 +129,5 @@ echo
 echo "🛑 Press Ctrl+C to stop all services"
 echo
 
-# Wait for all processes to finish
-if [ -n "$PAIMON_PID" ]; then
-    wait $BACKEND_PID $PAIMON_PID
-else
-    wait $BACKEND_PID
-fi
+# Wait for backend process to finish
+wait $BACKEND_PID

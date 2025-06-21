@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { getApiUrl } from '../../config/api';
 
 // Import sub-components (we'll extract these later)
 import BingoSquare from './BingoSquare';
@@ -44,6 +45,74 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
     }
   }, [boardData, progressData]);
 
+  // Point values for each rarity
+  const RARITY_POINTS = useMemo(() => ({
+    "FREE": 1,
+    "R": 2,
+    "SR": 3,
+    "SSR": 4,
+    "UR+": 6
+  }), []);
+
+  // Calculate points from marked cells
+  const calculateBasePoints = useCallback(() => {
+    let totalPoints = 0;
+    markedCells.forEach(index => {
+      if (index >= 0 && index < characters.length) {
+        const character = characters[index];
+        totalPoints += RARITY_POINTS[character.rarity];
+      }
+    });
+    return totalPoints;
+  }, [markedCells, characters, RARITY_POINTS]);
+
+  // Check if there's a bingo (5 in a row, column, or diagonal)
+  const checkForBingos = useCallback(() => {
+    const bingoBonus = 5; // Bonus points for each bingo
+    let bingoCount = 0;
+
+    // Convert markedCells set to a 5x5 grid for easier checking
+    const grid = Array(5).fill().map(() => Array(5).fill(false));
+    markedCells.forEach(index => {
+      const row = Math.floor(index / 5);
+      const col = index % 5;
+      grid[row][col] = true;
+    });
+
+    // Check rows
+    for (let row = 0; row < 5; row++) {
+      if (grid[row].every(cell => cell)) {
+        bingoCount++;
+      }
+    }
+
+    // Check columns
+    for (let col = 0; col < 5; col++) {
+      if (grid.every(row => row[col])) {
+        bingoCount++;
+      }
+    }
+
+    // Check main diagonal (top-left to bottom-right)
+    if (grid[0][0] && grid[1][1] && grid[2][2] && grid[3][3] && grid[4][4]) {
+      bingoCount++;
+    }
+
+    // Check other diagonal (top-right to bottom-left)
+    if (grid[0][4] && grid[1][3] && grid[2][2] && grid[3][1] && grid[4][0]) {
+      bingoCount++;
+    }
+
+    return bingoCount * bingoBonus;
+  }, [markedCells]);
+
+  // Calculate total points
+  const calculateTotalPoints = useCallback(() => {
+    const basePoints = calculateBasePoints();
+    const bingoPoints = checkForBingos();
+    return basePoints + bingoPoints;
+  }, [calculateBasePoints, checkForBingos]);
+
   // Save progress when marked cells change
   useEffect(() => {
     const saveProgress = async () => {
@@ -51,9 +120,9 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
         try {
           // Calculate score
           const newScore = calculateTotalPoints();
-          
+
           // Save to backend
-          await fetch(`http://localhost:5000/api/users/${userId}/boards/${boardId}/progress`, {
+          await fetch(getApiUrl(`/api/users/${userId}/boards/${boardId}/progress`), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -64,7 +133,7 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
               score: newScore
             }),
           });
-          
+
           // Update local score state
           setScore(newScore);
         } catch (error) {
@@ -85,7 +154,7 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
       setLoading(true);
 
       // Create a new board for the user
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/board`, {
+      const response = await fetch(getApiUrl(`/api/users/${userId}/board`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +172,7 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
       setCharacters(sortedCharacters);
 
       // Get the new progress (should have FREE space marked)
-      const progressResponse = await fetch(`http://localhost:5000/api/users/${userId}/boards/${newBoardData.id}/progress`);
+      const progressResponse = await fetch(getApiUrl(`/api/users/${userId}/boards/${newBoardData.id}/progress`));
       
       if (!progressResponse.ok) {
         throw new Error(`HTTP error! Status: ${progressResponse.status}`);
@@ -197,73 +266,7 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
     setSelectedCharacter(null);
   };
 
-  // Point values for each rarity
-  const RARITY_POINTS = {
-    "FREE": 1,
-    "R": 2,
-    "SR": 3,
-    "SSR": 4,
-    "UR+": 6
-  };
 
-  // Calculate points from marked cells
-  const calculateBasePoints = useCallback(() => {
-    let totalPoints = 0;
-    markedCells.forEach(index => {
-      if (index >= 0 && index < characters.length) {
-        const character = characters[index];
-        totalPoints += RARITY_POINTS[character.rarity];
-      }
-    });
-    return totalPoints;
-  }, [markedCells, characters]);
-
-  // Check if there's a bingo (5 in a row, column, or diagonal)
-  const checkForBingos = useCallback(() => {
-    const bingoBonus = 5; // Bonus points for each bingo
-    let bingoCount = 0;
-
-    // Convert markedCells set to a 5x5 grid for easier checking
-    const grid = Array(5).fill().map(() => Array(5).fill(false));
-    markedCells.forEach(index => {
-      const row = Math.floor(index / 5);
-      const col = index % 5;
-      grid[row][col] = true;
-    });
-
-    // Check rows
-    for (let row = 0; row < 5; row++) {
-      if (grid[row].every(cell => cell)) {
-        bingoCount++;
-      }
-    }
-
-    // Check columns
-    for (let col = 0; col < 5; col++) {
-      if (grid.every(row => row[col])) {
-        bingoCount++;
-      }
-    }
-
-    // Check main diagonal (top-left to bottom-right)
-    if (grid[0][0] && grid[1][1] && grid[2][2] && grid[3][3] && grid[4][4]) {
-      bingoCount++;
-    }
-
-    // Check other diagonal (top-right to bottom-left)
-    if (grid[0][4] && grid[1][3] && grid[2][2] && grid[3][1] && grid[4][0]) {
-      bingoCount++;
-    }
-
-    return bingoCount * bingoBonus;
-  }, [markedCells]);
-
-  // Calculate total points
-  const calculateTotalPoints = useCallback(() => {
-    const basePoints = calculateBasePoints();
-    const bingoPoints = checkForBingos();
-    return basePoints + bingoPoints;
-  }, [calculateBasePoints, checkForBingos]);
 
   if (loading) {
     return <div className="loading-message">Loading board...</div>;

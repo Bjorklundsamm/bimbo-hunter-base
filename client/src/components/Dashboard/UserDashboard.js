@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useUser } from '../Auth/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { Rules } from '../../App';
+import { getApiUrl } from '../../config/api';
 
 const UserDashboard = () => {
   // Get user context and navigation
@@ -22,7 +23,7 @@ const UserDashboard = () => {
     const fetchData = async () => {
       try {
         // Fetch all users
-        const usersResponse = await fetch('http://localhost:5000/api/users');
+        const usersResponse = await fetch(getApiUrl('/api/users'));
 
         if (!usersResponse.ok) {
           throw new Error(`HTTP error! Status: ${usersResponse.status}`);
@@ -33,7 +34,7 @@ const UserDashboard = () => {
 
         // Check if user has a board
         if (user) {
-          const boardResponse = await fetch(`http://localhost:5000/api/users/${user.id}/board`, {
+          const boardResponse = await fetch(getApiUrl(`/api/users/${user.id}/board`), {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -100,7 +101,7 @@ const UserDashboard = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`http://localhost:5000/api/users/${user.id}/board`, {
+      const response = await fetch(getApiUrl(`/api/users/${user.id}/board`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +137,7 @@ const UserDashboard = () => {
       setLoading(true);
       setShowRefreshConfirmation(false);
 
-      const response = await fetch(`http://localhost:5000/api/users/${user.id}/board`, {
+      const response = await fetch(getApiUrl(`/api/users/${user.id}/board`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
