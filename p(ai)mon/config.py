@@ -15,8 +15,14 @@ DISCORD_CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID', '0'))
 # Game API Configuration
 GAME_API_BASE_URL = os.getenv('GAME_API_BASE_URL', 'http://localhost:5000/api')
 
+# LLM Configuration for Agentic Workflow
+ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
+CLAUDE_MODEL = os.getenv('CLAUDE_MODEL', 'claude-3-sonnet-20240229')
+CLAUDE_MAX_TOKENS = int(os.getenv('CLAUDE_MAX_TOKENS', '4000'))
+CLAUDE_TEMPERATURE = float(os.getenv('CLAUDE_TEMPERATURE', '0.7'))
+
 # Bot Behavior Configuration
-MONITORING_INTERVAL = 30  # seconds between checks
+MONITORING_INTERVAL = 600  # 10 minutes between periodic checks (changed from 30 seconds)
 ANNOUNCEMENT_COOLDOWN = 300  # 5 minutes minimum between similar announcements
 DAILY_SUMMARY_HOUR = 21  # 9 PM for daily summaries
 QUIET_HOURS_START = 2  # 2 AM

@@ -1,22 +1,29 @@
 # app.py
-from flask import Flask, jsonify, send_from_directory, request, send_file
+from flask import Flask, jsonify, send_from_directory, request
 import random
 import os
-import uuid
-from werkzeug.utils import secure_filename
+import sys
 from PIL import Image
 import characters
 import tools
-import logging
 from models import User, Board, Progress
 from database import init_db
+from config import (
+    setup_logging, allowed_file, ensure_upload_dir,
+    UPLOAD_FOLDER, MAX_FILE_SIZE, ADMIN_PIN,
+    DEFAULT_HOST, DEFAULT_PORT, DEBUG_MODE,
+    MAX_IMAGE_SIZE, IMAGE_QUALITY, CORS_ORIGINS
+)
+from db_utils import get_db_connection
+
+# Add paimon directory to path for imports
+paimon_path = os.path.join(os.path.dirname(__file__), 'p(ai)mon')
+if paimon_path not in sys.path:
+    sys.path.append(paimon_path)
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+setup_logging()
+logger = __import__('logging').getLogger(__name__)
 
 # Initialize the database
 init_db()
@@ -24,18 +31,41 @@ init_db()
 app = Flask(__name__, static_folder='client/build', static_url_path='')
 
 # Configuration for file uploads
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-app.config['UPLOAD_FOLDER'] = 'client/public/user-images'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+# Ensure upload directory exists
+ensure_upload_dir()
+
+def trigger_paimon_update(update_type, update_data):
+    """
+    Trigger a Paimon update by adding it to the update queue
+
+    Args:
+        update_type (str): Type of update (from UPDATE_TYPES)
+        update_data (dict): Data associated with the update
+    """
+    try:
+        from context_manager import get_context_manager
+        from prompts import UPDATE_TYPES
+
+        context_manager = get_context_manager()
+        success = context_manager.add_update(update_type, update_data)
+
+        if success:
+            logger.info(f"Triggered Paimon update: {update_type}")
+        else:
+            logger.error(f"Failed to trigger Paimon update: {update_type}")
+
+    except Exception as e:
+        logger.error(f"Error triggering Paimon update: {e}")
 
 # Enable CORS manually
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    # Use configured origins in production, allow all in development
+    origin = '*' if DEBUG_MODE else ','.join(CORS_ORIGINS)
+    response.headers.add('Access-Control-Allow-Origin', origin)
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
@@ -87,7 +117,7 @@ def login():
         return jsonify({'error': 'PIN is required'}), 400
 
     # Check for admin PIN
-    if pin == 'cardsagainsthumanity':
+    if pin == ADMIN_PIN:
         admin_user = {
             'id': -1,
             'pin': pin,
@@ -121,6 +151,13 @@ def register():
     user = User.create(pin, display_name)
 
     if user:
+        # Trigger Paimon update for new user registration
+        trigger_paimon_update('user_registered', {
+            'user_id': user['id'],
+            'display_name': user['display_name'],
+            'pin': user['pin']
+        })
+
         return jsonify({'success': True, 'user': user})
     else:
         return jsonify({'error': 'Display name already taken or failed to create user'}), 400
@@ -162,6 +199,16 @@ def create_user_board(user_id):
             # Calculate score for FREE square (1 point)
             score = 1
             Progress.create_or_update(user_id, new_board['id'], marked_cells, score)
+
+        # Get user info for Paimon trigger
+        user = User.get_by_id(user_id)
+        if user:
+            # Trigger Paimon update for new board creation
+            trigger_paimon_update('board_created', {
+                'user_id': user_id,
+                'display_name': user['display_name'],
+                'board_id': new_board['id']
+            })
 
         return jsonify(new_board)
     else:
@@ -258,10 +305,44 @@ def update_progress(user_id, board_id):
     user_images = data.get('user_images', {})
     score = data.get('score', 0)
 
+    # Get old progress for comparison
+    old_progress = Progress.get_by_user_board(user_id, board_id)
+    old_score = old_progress['score'] if old_progress else 0
+    old_marked_cells = old_progress['marked_cells'] if old_progress else []
+
     # Update progress
     progress = Progress.create_or_update(user_id, board_id, marked_cells, score, user_images)
 
     if progress:
+        # Get user info and board data for Paimon trigger
+        user = User.get_by_id(user_id)
+        board = Board.get_by_id(board_id)
+
+        if user and board and score != old_score:
+            # Determine new claims
+            new_cell_indices = [idx for idx in marked_cells if idx not in old_marked_cells]
+            new_claims = []
+
+            if new_cell_indices and board['board_data']:
+                for idx in new_cell_indices:
+                    if 0 <= idx < len(board['board_data']):
+                        char = board['board_data'][idx]
+                        new_claims.append({
+                            'name': char.get('name', 'Unknown'),
+                            'rarity': char.get('rarity', 'Unknown')
+                        })
+
+            # Trigger Paimon update for progress change
+            trigger_paimon_update('progress_updated', {
+                'user_id': user_id,
+                'display_name': user['display_name'],
+                'board_id': board_id,
+                'old_score': old_score,
+                'new_score': score,
+                'new_claims': new_claims,
+                'total_marked': len(marked_cells)
+            })
+
         return jsonify(progress)
     else:
         return jsonify({'error': 'Failed to update progress'}), 500
@@ -284,13 +365,15 @@ def get_group_points():
 def admin_restart_server():
     """Restart the server (admin only)"""
     import os
-    import sys
+    import signal
 
     try:
         # This will restart the server by exiting the current process
         # The process manager (like systemd, supervisor, or manual restart) should restart it
         logger.info("Admin requested server restart")
-        os.execv(sys.executable, ['python'] + sys.argv)
+        # Note: os.execv doesn't return, so the return statement after it is unreachable
+        # We'll use a different approach for graceful restart
+        os.kill(os.getpid(), signal.SIGTERM)
         return jsonify({'success': True, 'message': 'Server restarting...'})
     except Exception as e:
         logger.error(f"Error restarting server: {e}")
@@ -300,23 +383,18 @@ def admin_restart_server():
 def admin_delete_all_boards():
     """Delete all boards and progress data (admin only)"""
     try:
-        from database import get_db_connection
-        conn = get_db_connection()
-        if conn is None:
-            return jsonify({'error': 'Database connection failed'}), 500
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
 
-        cursor = conn.cursor()
+            # Delete all progress first (due to foreign key constraints)
+            cursor.execute("DELETE FROM progress")
+            progress_deleted = cursor.rowcount
 
-        # Delete all progress first (due to foreign key constraints)
-        cursor.execute("DELETE FROM progress")
-        progress_deleted = cursor.rowcount
+            # Delete all boards
+            cursor.execute("DELETE FROM boards")
+            boards_deleted = cursor.rowcount
 
-        # Delete all boards
-        cursor.execute("DELETE FROM boards")
-        boards_deleted = cursor.rowcount
-
-        conn.commit()
-        conn.close()
+            conn.commit()
 
         logger.info(f"Admin deleted all boards: {boards_deleted} boards, {progress_deleted} progress records")
         return jsonify({
@@ -332,27 +410,22 @@ def admin_delete_all_boards():
 def admin_delete_all_players():
     """Delete all players and their data (admin only)"""
     try:
-        from database import get_db_connection
-        conn = get_db_connection()
-        if conn is None:
-            return jsonify({'error': 'Database connection failed'}), 500
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
 
-        cursor = conn.cursor()
+            # Delete all progress first
+            cursor.execute("DELETE FROM progress")
+            progress_deleted = cursor.rowcount
 
-        # Delete all progress first
-        cursor.execute("DELETE FROM progress")
-        progress_deleted = cursor.rowcount
+            # Delete all boards
+            cursor.execute("DELETE FROM boards")
+            boards_deleted = cursor.rowcount
 
-        # Delete all boards
-        cursor.execute("DELETE FROM boards")
-        boards_deleted = cursor.rowcount
+            # Delete all users
+            cursor.execute("DELETE FROM users")
+            users_deleted = cursor.rowcount
 
-        # Delete all users
-        cursor.execute("DELETE FROM users")
-        users_deleted = cursor.rowcount
-
-        conn.commit()
-        conn.close()
+            conn.commit()
 
         logger.info(f"Admin deleted all players: {users_deleted} users, {boards_deleted} boards, {progress_deleted} progress records")
         return jsonify({
@@ -373,27 +446,22 @@ def admin_delete_player(user_id):
         if not user:
             return jsonify({'error': 'Player not found'}), 404
 
-        from database import get_db_connection
-        conn = get_db_connection()
-        if conn is None:
-            return jsonify({'error': 'Database connection failed'}), 500
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
 
-        cursor = conn.cursor()
+            # Delete progress for this user
+            cursor.execute("DELETE FROM progress WHERE user_id = ?", (user_id,))
+            progress_deleted = cursor.rowcount
 
-        # Delete progress for this user
-        cursor.execute("DELETE FROM progress WHERE user_id = ?", (user_id,))
-        progress_deleted = cursor.rowcount
+            # Delete boards for this user
+            cursor.execute("DELETE FROM boards WHERE user_id = ?", (user_id,))
+            boards_deleted = cursor.rowcount
 
-        # Delete boards for this user
-        cursor.execute("DELETE FROM boards WHERE user_id = ?", (user_id,))
-        boards_deleted = cursor.rowcount
+            # Delete the user
+            cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
+            user_deleted = cursor.rowcount
 
-        # Delete the user
-        cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
-        user_deleted = cursor.rowcount
-
-        conn.commit()
-        conn.close()
+            conn.commit()
 
         if user_deleted > 0:
             logger.info(f"Admin deleted player '{user['display_name']}' (ID: {user_id})")
@@ -417,23 +485,18 @@ def admin_delete_board(user_id):
         if not user:
             return jsonify({'error': 'Player not found'}), 404
 
-        from database import get_db_connection
-        conn = get_db_connection()
-        if conn is None:
-            return jsonify({'error': 'Database connection failed'}), 500
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
 
-        cursor = conn.cursor()
+            # Delete progress for this user
+            cursor.execute("DELETE FROM progress WHERE user_id = ?", (user_id,))
+            progress_deleted = cursor.rowcount
 
-        # Delete progress for this user
-        cursor.execute("DELETE FROM progress WHERE user_id = ?", (user_id,))
-        progress_deleted = cursor.rowcount
+            # Delete boards for this user
+            cursor.execute("DELETE FROM boards WHERE user_id = ?", (user_id,))
+            boards_deleted = cursor.rowcount
 
-        # Delete boards for this user
-        cursor.execute("DELETE FROM boards WHERE user_id = ?", (user_id,))
-        boards_deleted = cursor.rowcount
-
-        conn.commit()
-        conn.close()
+            conn.commit()
 
         logger.info(f"Admin deleted board for player '{user['display_name']}' (ID: {user_id})")
         return jsonify({
@@ -548,9 +611,9 @@ def upload_square_image(user_id, board_id, square_index):
                 if img.mode in ('RGBA', 'LA', 'P'):
                     img = img.convert('RGB')
 
-                # Resize to max 800px on longest side while maintaining aspect ratio
-                img.thumbnail((800, 800), Image.Resampling.LANCZOS)
-                img.save(filepath, optimize=True, quality=85)
+                # Resize to max dimensions while maintaining aspect ratio
+                img.thumbnail(MAX_IMAGE_SIZE, Image.Resampling.LANCZOS)
+                img.save(filepath, optimize=True, quality=IMAGE_QUALITY)
 
             # Return the relative path for frontend use
             relative_path = f"/user-images/{user_id}/{board_id}/{filename}"
@@ -562,11 +625,7 @@ def upload_square_image(user_id, board_id, square_index):
 
     return jsonify({'error': 'Invalid file type'}), 400
 
-@app.route('/resources/<path:path>')
-def serve_resources(path):
-    """Serve static resources"""
-    # Serve the file from the resources directory
-    return send_from_directory('resources', path)
+
 
 # Production build serving routes
 @app.route('/static/<path:path>')
@@ -615,8 +674,8 @@ def serve_react_app(path):
         return jsonify({'error': 'Failed to serve application'}), 500
 
 if __name__ == '__main__':
-    print("Starting Bimbo Hunter production server...")
+    print("Starting Bingo Hunter production server...")
     print("Build directory exists:", os.path.exists('client/build'))
     print("Index.html exists:", os.path.exists('client/build/index.html'))
-    print("Server will be available at: http://localhost:5000")
-    app.run(debug=False, host='0.0.0.0', port=5000)
+    print(f"Server will be available at: http://localhost:{DEFAULT_PORT}")
+    app.run(debug=DEBUG_MODE, host=DEFAULT_HOST, port=DEFAULT_PORT)

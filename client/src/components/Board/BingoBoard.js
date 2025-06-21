@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 // Import sub-components (we'll extract these later)
 import BingoSquare from './BingoSquare';
@@ -77,7 +77,7 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
     if (markedCells.size > 0 && !isReadOnly) {
       saveProgress();
     }
-  }, [markedCells, userImages, isReadOnly, userId, boardId, characters]);
+  }, [markedCells, userImages, isReadOnly, userId, boardId, characters, calculateTotalPoints]);
 
   // Function to fetch characters and generate a new board
   const fetchCharactersAndGenerateBoard = async () => {
@@ -207,7 +207,7 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
   };
 
   // Calculate points from marked cells
-  const calculateBasePoints = () => {
+  const calculateBasePoints = useCallback(() => {
     let totalPoints = 0;
     markedCells.forEach(index => {
       if (index >= 0 && index < characters.length) {
@@ -216,10 +216,10 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
       }
     });
     return totalPoints;
-  };
+  }, [markedCells, characters]);
 
   // Check if there's a bingo (5 in a row, column, or diagonal)
-  const checkForBingos = () => {
+  const checkForBingos = useCallback(() => {
     const bingoBonus = 5; // Bonus points for each bingo
     let bingoCount = 0;
 
@@ -256,14 +256,14 @@ const BingoBoard = ({ boardData, progressData, isReadOnly, userId, boardId }) =>
     }
 
     return bingoCount * bingoBonus;
-  };
+  }, [markedCells]);
 
   // Calculate total points
-  const calculateTotalPoints = () => {
+  const calculateTotalPoints = useCallback(() => {
     const basePoints = calculateBasePoints();
     const bingoPoints = checkForBingos();
     return basePoints + bingoPoints;
-  };
+  }, [calculateBasePoints, checkForBingos]);
 
   if (loading) {
     return <div className="loading-message">Loading board...</div>;

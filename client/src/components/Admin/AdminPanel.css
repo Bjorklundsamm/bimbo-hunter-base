@@ -15,7 +15,7 @@
 }
 
 .admin-header h1 {
-  font-family: 'Absender', sans-serif;
+  font-family: var(--font-primary);
   font-size: 2.5rem;
   margin: 0 0 10px 0;
   color: #ff6b35;
@@ -30,7 +30,7 @@
 }
 
 .admin-header-info p {
-  font-family: 'vividly', sans-serif;
+  font-family: var(--font-secondary);
   font-size: 1.2rem;
   margin: 0;
   color: #ccc;
@@ -76,7 +76,7 @@
 }
 
 .admin-section h2 {
-  font-family: 'Absender', sans-serif;
+  font-family: var(--font-primary);
   font-size: 1.8rem;
   margin: 0 0 20px 0;
   color: #ff6b35;
@@ -91,7 +91,7 @@
   padding: 12px 24px;
   border-radius: 5px;
   cursor: pointer;
-  font-family: 'Absender', sans-serif;
+  font-family: var(--font-primary);
   font-size: 1rem;
   margin: 5px;
   transition: all 0.3s ease;
@@ -151,13 +151,13 @@
 }
 
 .player-name {
-  font-family: 'Absender', sans-serif;
+  font-family: var(--font-primary);
   font-size: 1.2rem;
   color: #ff6b35;
 }
 
 .player-pin {
-  font-family: 'vividly', sans-serif;
+  font-family: var(--font-secondary);
   font-size: 0.9rem;
   color: #ccc;
 }
@@ -182,7 +182,7 @@
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.1);
   color: white;
-  font-family: 'vividly', sans-serif;
+  font-family: var(--font-secondary);
   min-width: 150px;
 }
 
@@ -213,13 +213,13 @@
 }
 
 .board-player {
-  font-family: 'Absender', sans-serif;
+  font-family: var(--font-primary);
   font-size: 1.2rem;
   color: #ff6b35;
 }
 
 .board-created {
-  font-family: 'vividly', sans-serif;
+  font-family: var(--font-secondary);
   font-size: 0.9rem;
   color: #ccc;
 }

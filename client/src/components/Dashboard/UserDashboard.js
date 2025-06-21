@@ -60,17 +60,12 @@ const UserDashboard = () => {
     };
 
     fetchData();
-  }, [user]);
+  }, [user, navigate]);
 
   // Handle logout
   const handleLogout = () => {
     logout();
     navigate('/');
-  };
-
-  // Navigate to current user's board
-  const viewMyBoard = () => {
-    navigate(`/boards/${encodeURIComponent(user.display_name)}`);
   };
 
   // Navigate to another user's board
@@ -128,11 +123,6 @@ const UserDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Handle refresh board button click
-  const handleRefreshClick = () => {
-    setShowRefreshConfirmation(true);
   };
 
   // Handle cancel refresh

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
 import './App.css';
 
 // Import components
@@ -126,6 +126,28 @@ const AppContent = () => {
   );
 };
 
+// Footer component with logout button for logged-in users
+const AppFooter = () => {
+  const { user, logout } = useUser();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  return (
+    <footer className="app-footer">
+      <p>Enjoy the game!</p>
+      {user && (
+        <button onClick={handleLogout} className="footer-logout-button">
+          Logout
+        </button>
+      )}
+    </footer>
+  );
+};
+
 // Routes component with header
 const AppRoutes = () => {
   return (
@@ -200,9 +222,7 @@ const AppRoutes = () => {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
 
-        <footer className="app-footer">
-          <p>Enjoy the game!</p>
-        </footer>
+        <AppFooter />
       </div>
   );
 };

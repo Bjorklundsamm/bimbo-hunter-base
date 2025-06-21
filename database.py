@@ -8,16 +8,9 @@ import sqlite3
 from sqlite3 import Error
 import json
 import logging
+from config import DB_FILE
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
 logger = logging.getLogger(__name__)
-
-# Database file path
-DB_FILE = "bhunter.db"
 
 def get_db_connection():
     """
@@ -80,6 +73,26 @@ def init_db():
     );
     """
 
+    create_paimon_context_table = """
+    CREATE TABLE IF NOT EXISTS paimon_context (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        context_data TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """
+
+    create_paimon_updates_table = """
+    CREATE TABLE IF NOT EXISTS paimon_updates (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        update_type TEXT NOT NULL,
+        update_data TEXT NOT NULL,
+        processed BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        processed_at TIMESTAMP NULL
+    );
+    """
+
     # Connect to database and create tables
     conn = get_db_connection()
     if conn is not None:
@@ -88,6 +101,8 @@ def init_db():
             cursor.execute(create_users_table)
             cursor.execute(create_boards_table)
             cursor.execute(create_progress_table)
+            cursor.execute(create_paimon_context_table)
+            cursor.execute(create_paimon_updates_table)
             conn.commit()
             logger.info("Database schema created successfully")
         except Error as e:

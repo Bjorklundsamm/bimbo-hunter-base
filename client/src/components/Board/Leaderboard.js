@@ -41,9 +41,6 @@ const Leaderboard = () => {
   // Sort data by score in descending order
   const sortedData = [...leaderboardData].sort((a, b) => b.score - a.score);
 
-  // Find the maximum score for scaling
-  const maxScore = Math.max(...sortedData.map(user => user.score || 0), 1); // Ensure we don't divide by zero
-
   // Truncate display name to max 16 characters
   const truncateDisplayName = (displayName) => {
     if (displayName.length <= 16) {

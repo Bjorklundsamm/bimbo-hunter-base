@@ -1,14 +1,11 @@
-blinker==1.8.2
-click==8.1.8
-colorama==0.4.6
+# Core Flask web framework
 flask==3.0.3
-Flask-Cors==5.0.0
-importlib-metadata==8.5.0
-itsdangerous==2.2.0
-jinja2==3.1.6
-MarkupSafe==2.1.5
+
+# Image processing for user uploads
 pillow==10.4.0
-werkzeug==3.0.6
-zipp==3.20.2
-discord.py==2.3.2
-python-dotenv==1.0.0
+
+# Note: Other dependencies (blinker, click, itsdangerous, jinja2, MarkupSafe, werkzeug)
+# are automatically installed as Flask dependencies
+
+# Paimon dependencies are now managed separately in p(ai)mon/requirements.txt
+# This keeps the main app lightweight and separates concerns

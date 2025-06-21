@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useUser } from '../Auth/UserContext';
 import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
@@ -13,12 +13,9 @@ const AdminPanel = () => {
   // State for different admin operations
   const [players, setPlayers] = useState([]);
   const [boards, setBoards] = useState([]);
-  const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [selectedBoard, setSelectedBoard] = useState(null);
   const [editingDisplayName, setEditingDisplayName] = useState(null);
   const [newDisplayName, setNewDisplayName] = useState('');
   const [editingBoard, setEditingBoard] = useState(null);
-  const [boardProgress, setBoardProgress] = useState(null);
 
   // Fetch players and boards on component mount
   useEffect(() => {
@@ -390,11 +387,7 @@ const BoardEditor = ({ board, onClose, onUpdate }) => {
   const [boardProgress, setBoardProgress] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchBoardProgress();
-  }, [board]);
-
-  const fetchBoardProgress = async () => {
+  const fetchBoardProgress = useCallback(async () => {
     try {
       const response = await fetch(`http://localhost:5000/api/boards/${encodeURIComponent(board.display_name)}/progress`);
       if (response.ok) {
@@ -404,7 +397,11 @@ const BoardEditor = ({ board, onClose, onUpdate }) => {
     } catch (error) {
       console.error('Error fetching board progress:', error);
     }
-  };
+  }, [board.display_name]);
+
+  useEffect(() => {
+    fetchBoardProgress();
+  }, [fetchBoardProgress]);
 
   const toggleSquare = async (squareIndex) => {
     if (!boardProgress) return;
