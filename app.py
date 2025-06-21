@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, jsonify, send_from_directory, request
+from flask import Flask, jsonify, send_from_directory, request, send_file
 import random
 import os
 import sys
@@ -28,6 +28,7 @@ logger = __import__('logging').getLogger(__name__)
 # Initialize the database
 init_db()
 
+app = Flask(__name__, static_folder='client/build', static_url_path='')
 app = Flask(__name__, static_folder='client/build', static_url_path='')
 
 # Configuration for file uploads
@@ -70,6 +71,7 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
 
+# Root route is handled by the React app serving route at the bottom
 # Root route is handled by the React app serving route at the bottom
 
 @app.route('/api/characters', methods=['GET'])
@@ -132,6 +134,7 @@ def login():
     user = User.get_by_pin(pin)
 
     if user:
+        user['is_admin'] = False
         user['is_admin'] = False
         return jsonify({'success': True, 'user': user})
     else:
@@ -268,6 +271,16 @@ def get_board_progress_by_display_name(display_name):
         else:
             # Fallback if no FREE square found
             new_progress = Progress.create_or_update(user['id'], board['id'], [], 0)
+        # Initialize progress with FREE space marked
+        board_data = board['board_data']
+        free_index = next((i for i, char in enumerate(board_data) if char['rarity'] == 'FREE'), -1)
+        if free_index != -1:
+            marked_cells = [free_index]
+            score = 1  # FREE square is worth 1 point
+            new_progress = Progress.create_or_update(user['id'], board['id'], marked_cells, score)
+        else:
+            # Fallback if no FREE square found
+            new_progress = Progress.create_or_update(user['id'], board['id'], [], 0)
         return jsonify(new_progress)
 
 # Progress Tracking Endpoints
@@ -280,6 +293,21 @@ def get_progress(user_id, board_id):
     if progress:
         return jsonify(progress)
     else:
+        # Initialize progress with FREE space marked
+        board = Board.get_by_id(board_id)
+        if board:
+            board_data = board['board_data']
+            free_index = next((i for i, char in enumerate(board_data) if char['rarity'] == 'FREE'), -1)
+            if free_index != -1:
+                marked_cells = [free_index]
+                score = 1  # FREE square is worth 1 point
+                new_progress = Progress.create_or_update(user_id, board_id, marked_cells, score)
+            else:
+                # Fallback if no FREE square found
+                new_progress = Progress.create_or_update(user_id, board_id, [], 0)
+        else:
+            # Fallback if board not found
+            new_progress = Progress.create_or_update(user_id, board_id, [], 0)
         # Initialize progress with FREE space marked
         board = Board.get_by_id(board_id)
         if board:
