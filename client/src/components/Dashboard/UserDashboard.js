@@ -3,6 +3,7 @@ import { useUser } from '../Auth/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { Rules } from '../../App';
 import { getApiUrl } from '../../config/api';
+import HowToPlay from '../HowToPlay/HowToPlay';
 
 const UserDashboard = () => {
   // Get user context and navigation
@@ -17,6 +18,8 @@ const UserDashboard = () => {
   const [showRefreshConfirmation, setShowRefreshConfirmation] = useState(false);
   const [showAgreementModal, setShowAgreementModal] = useState(false);
   const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showRules, setShowRules] = useState(false);
 
   // Fetch all users and check if current user has a board on component mount
   useEffect(() => {
@@ -93,6 +96,28 @@ const UserDashboard = () => {
   const handleAgreementCancel = () => {
     setShowAgreementModal(false);
     setHasAgreedToTerms(false);
+  };
+
+  // Handle showing How to Play content
+  const handleShowHowToPlay = (e) => {
+    e.preventDefault();
+    setShowHowToPlay(true);
+  };
+
+  // Handle showing Rules content
+  const handleShowRules = (e) => {
+    e.preventDefault();
+    setShowRules(true);
+  };
+
+  // Handle closing How to Play overlay
+  const handleCloseHowToPlay = () => {
+    setShowHowToPlay(false);
+  };
+
+  // Handle closing Rules overlay
+  const handleCloseRules = () => {
+    setShowRules(false);
   };
 
   // Create a new board for the current user
@@ -250,7 +275,7 @@ const UserDashboard = () => {
             <h3>Before You Start Playing</h3>
             <div className="agreement-text">
               <p>
-                Before playing or making any complaints, you must read the <a href="/how-to-play" target="_blank" rel="noopener noreferrer">How to Play</a> section and the <a href="#rules">Rules</a> to understand the game mechanics, scoring system, and proper etiquette.
+                Before playing or making any complaints, you must read the <button onClick={handleShowHowToPlay} className="agreement-link-button">How to Play</button> section and the <button onClick={handleShowRules} className="agreement-link-button">Rules</button> to understand the game mechanics, scoring system, and proper etiquette.
               </p>
             </div>
             <div className="agreement-checkbox-section">
@@ -274,6 +299,36 @@ const UserDashboard = () => {
               >
                 Start Playing!
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* How to Play overlay */}
+      {showHowToPlay && (
+        <div className="confirmation-overlay">
+          <div className="content-modal">
+            <div className="content-modal-header">
+              <h3>How to Play</h3>
+              <button onClick={handleCloseHowToPlay} className="close-button">×</button>
+            </div>
+            <div className="content-modal-body">
+              <HowToPlay />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rules overlay */}
+      {showRules && (
+        <div className="confirmation-overlay">
+          <div className="content-modal">
+            <div className="content-modal-header">
+              <h3>Rules</h3>
+              <button onClick={handleCloseRules} className="close-button">×</button>
+            </div>
+            <div className="content-modal-body">
+              <Rules />
             </div>
           </div>
         </div>

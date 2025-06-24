@@ -31,9 +31,13 @@ fi
 # Check if virtual environment is activated
 if [ -z "$VIRTUAL_ENV" ]; then
     echo "⚠️  Virtual environment not detected. Activating..."
-    if [ -f "venv/bin/activate" ]; then
+    # Check for Windows (Scripts) or Unix (bin) activation script
+    if [ -f "venv/Scripts/activate" ]; then
+        source venv/Scripts/activate
+        echo "✅ Virtual environment activated (Windows)."
+    elif [ -f "venv/bin/activate" ]; then
         source venv/bin/activate
-        echo "✅ Virtual environment activated."
+        echo "✅ Virtual environment activated (Unix)."
     else
         echo "❌ Virtual environment not found. Please create one with: python -m venv venv"
         exit 1
@@ -53,7 +57,7 @@ fi
 
 # Install/update Paimon dependencies
 echo "📦 Checking Paimon dependencies..."
-pip install -r p\(ai\)mon/requirements.txt > /dev/null 2>&1
+pip install -r "p(ai)mon/requirements.txt" > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     echo "✅ Paimon dependencies up to date."
 else
@@ -66,7 +70,7 @@ echo
 if [ ! -f "p(ai)mon/.env" ]; then
     echo "⚠️  Paimon .env file not found."
     echo "📝 Please configure Paimon:"
-    echo "   cp p\(ai\)mon/.env.example p\(ai\)mon/.env"
+    echo "   cp \"p(ai)mon/.env.example\" \"p(ai)mon/.env\""
     echo "   # Edit .env with your Discord bot token and Anthropic API key"
     echo
     read -p "Continue without Paimon? (y/N): " -n 1 -r
