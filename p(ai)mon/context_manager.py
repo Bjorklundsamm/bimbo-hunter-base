@@ -242,7 +242,7 @@ class ContextManager:
             new_claims = update_data.get('new_claims', [])
             
             if new_claims:
-                claim_text = ", ".join([f"{char['Name']}({char['rarity']})" for char in new_claims])
+                claim_text = ", ".join([f"{char.get('Name', char.get('name', 'Unknown'))}({char.get('rarity', 'Unknown')})" for char in new_claims])
                 return f"{display_name} claimed new characters: {claim_text}. Score increased from {old_score} to {new_score} points."
             else:
                 return f"{display_name} updated their progress. Score: {new_score} points."

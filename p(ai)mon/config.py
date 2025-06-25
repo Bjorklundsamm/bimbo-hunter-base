@@ -17,7 +17,7 @@ GAME_API_BASE_URL = os.getenv('GAME_API_BASE_URL', 'http://localhost:5000/api')
 
 # LLM Configuration for Agentic Workflow
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
-CLAUDE_MODEL = os.getenv('CLAUDE_MODEL', 'claude-3-sonnet-20240229')
+CLAUDE_MODEL = os.getenv('CLAUDE_MODEL', 'claude-3-5-sonnet-20241022')
 CLAUDE_MAX_TOKENS = int(os.getenv('CLAUDE_MAX_TOKENS', '4000'))
 CLAUDE_TEMPERATURE = float(os.getenv('CLAUDE_TEMPERATURE', '0.7'))
 
