@@ -5,7 +5,7 @@ Main bot file that coordinates all functionality
 
 import discord
 from discord.ext import tasks
-from utils import setup_project_path, setup_paimon_logging, format_discord_message
+from utils import setup_project_path, setup_paimon_logging
 
 # Set up project path for imports
 setup_project_path()
@@ -46,7 +46,7 @@ class PaimonBot(discord.Client):
             self.target_channel = self.get_channel(DISCORD_CHANNEL_ID)
             if self.target_channel:
                 logger.info(f'Connected to channel: {self.target_channel.name}')
-                await self.target_channel.send("🌟 Paimon is here and ready to help with your bimbo hunting adventure! 🎯")
+                await self.target_channel.send("🌟 Paimon is now monitoring your bimbo hunting progress! 📊")
             else:
                 logger.error(f'Could not find channel with ID: {DISCORD_CHANNEL_ID}')
         else:
@@ -57,7 +57,7 @@ class PaimonBot(discord.Client):
             self.monitor_game.start()
 
     async def on_message(self, message):
-        """Handle incoming messages"""
+        """Handle incoming messages - DISABLED: Paimon only monitors and announces"""
         # Don't respond to our own messages
         if message.author == self.user:
             return
@@ -66,10 +66,10 @@ class PaimonBot(discord.Client):
         if self.target_channel and message.channel != self.target_channel:
             return
 
-        # Handle the message
-        response = self.chat_handler.handle_message(message.content, message.author.display_name)
-        if response:
-            await message.channel.send(response)
+        # Chat responses are disabled - Paimon only monitors database and makes announcements
+        # response = self.chat_handler.handle_message(message.content, message.author.display_name)
+        # if response:
+        #     await message.channel.send(response)
 
     @tasks.loop(seconds=MONITORING_INTERVAL)
     async def monitor_game(self):

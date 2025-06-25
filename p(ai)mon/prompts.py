@@ -111,7 +111,7 @@ def format_user_for_context(user_data, board_data, progress_data):
         for cell_idx in marked_cells:
             if 0 <= cell_idx < len(board_chars):
                 char = board_chars[cell_idx]
-                char_name = char.get('name', 'Unknown')
+                char_name = char.get('Name', 'Unknown')
                 char_rarity = char.get('rarity', 'Unknown')
                 claimed_chars.append(f"{char_name}({char_rarity})")
     

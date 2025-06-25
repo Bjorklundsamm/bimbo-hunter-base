@@ -356,7 +356,7 @@ def update_progress(user_id, board_id):
                     if 0 <= idx < len(board['board_data']):
                         char = board['board_data'][idx]
                         new_claims.append({
-                            'name': char.get('name', 'Unknown'),
+                            'name': char.get('Name', 'Unknown'),
                             'rarity': char.get('rarity', 'Unknown')
                         })
 
