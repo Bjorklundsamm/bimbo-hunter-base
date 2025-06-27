@@ -18,13 +18,7 @@ These documentation files are primarily for human reference and are not actively
 - **ADMIN_COMMANDS.md** - Guide for administrative commands and database management
 - **PRODUCTION-DEPLOYMENT.md** - Production deployment procedures and configuration
 
-### Paimon Discord Bot Documentation
-- **PAIMON_SETUP.md** - Complete setup guide for the Paimon Discord bot
-- **PAIMON_IMPROVEMENTS.md** - Documentation of bug fixes and feature enhancements
-- **PAIMON_AGENTIC_WORKFLOW.md** - Technical details of the agentic workflow implementation
-- **CONTEXTUAL_IMPROVEMENTS.md** - Improvements to Paimon's contextual intelligence
-- **PAIMON_README.md** (from p(ai)mon) - Basic Paimon bot overview and quick start
-- **SETUP.md** (from p(ai)mon) - Detailed Paimon setup instructions
+
 
 ## Usage
 
@@ -32,7 +26,6 @@ These files can be referenced when:
 - Setting up the project for the first time
 - Troubleshooting issues
 - Understanding feature implementations
-- Configuring the Discord bot
 - Deploying to production
 
 ## Note

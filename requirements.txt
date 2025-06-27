@@ -7,5 +7,4 @@ pillow==10.4.0
 # Note: Other dependencies (blinker, click, itsdangerous, jinja2, MarkupSafe, werkzeug)
 # are automatically installed as Flask dependencies
 
-# Paimon dependencies are now managed separately in p(ai)mon/requirements.txt
-# This keeps the main app lightweight and separates concerns
+

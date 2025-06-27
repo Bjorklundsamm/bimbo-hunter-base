@@ -2,7 +2,6 @@
 from flask import Flask, jsonify, send_from_directory, request, send_file
 import random
 import os
-import sys
 from PIL import Image
 import characters
 import tools
@@ -16,10 +15,7 @@ from config import (
 )
 from db_utils import get_db_connection
 
-# Add paimon directory to path for imports
-paimon_path = os.path.join(os.path.dirname(__file__), 'p(ai)mon')
-if paimon_path not in sys.path:
-    sys.path.append(paimon_path)
+
 
 # Configure logging
 setup_logging()
@@ -38,28 +34,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Ensure upload directory exists
 ensure_upload_dir()
 
-def trigger_paimon_update(update_type, update_data):
-    """
-    Trigger a Paimon update by adding it to the update queue
 
-    Args:
-        update_type (str): Type of update (from UPDATE_TYPES)
-        update_data (dict): Data associated with the update
-    """
-    try:
-        from context_manager import get_context_manager
-        from prompts import UPDATE_TYPES
-
-        context_manager = get_context_manager()
-        success = context_manager.add_update(update_type, update_data)
-
-        if success:
-            logger.info(f"Triggered Paimon update: {update_type}")
-        else:
-            logger.error(f"Failed to trigger Paimon update: {update_type}")
-
-    except Exception as e:
-        logger.error(f"Error triggering Paimon update: {e}")
 
 # Enable CORS manually
 @app.after_request
@@ -154,12 +129,7 @@ def register():
     user = User.create(pin, display_name)
 
     if user:
-        # Trigger Paimon update for new user registration
-        trigger_paimon_update('user_registered', {
-            'user_id': user['id'],
-            'display_name': user['display_name'],
-            'pin': user['pin']
-        })
+
 
         return jsonify({'success': True, 'user': user})
     else:
@@ -203,15 +173,7 @@ def create_user_board(user_id):
             score = 1
             Progress.create_or_update(user_id, new_board['id'], marked_cells, score)
 
-        # Get user info for Paimon trigger
-        user = User.get_by_id(user_id)
-        if user:
-            # Trigger Paimon update for new board creation
-            trigger_paimon_update('board_created', {
-                'user_id': user_id,
-                'display_name': user['display_name'],
-                'board_id': new_board['id']
-            })
+
 
         return jsonify(new_board)
     else:
@@ -333,43 +295,15 @@ def update_progress(user_id, board_id):
     user_images = data.get('user_images', {})
     score = data.get('score', 0)
 
-    # Get old progress for comparison
-    old_progress = Progress.get_by_user_board(user_id, board_id)
-    old_score = old_progress['score'] if old_progress else 0
-    old_marked_cells = old_progress['marked_cells'] if old_progress else []
+
 
     # Update progress
     progress = Progress.create_or_update(user_id, board_id, marked_cells, score, user_images)
 
     if progress:
-        # Get user info and board data for Paimon trigger
-        user = User.get_by_id(user_id)
-        board = Board.get_by_id(board_id)
 
-        if user and board and score != old_score:
-            # Determine new claims
-            new_cell_indices = [idx for idx in marked_cells if idx not in old_marked_cells]
-            new_claims = []
 
-            if new_cell_indices and board['board_data']:
-                for idx in new_cell_indices:
-                    if 0 <= idx < len(board['board_data']):
-                        char = board['board_data'][idx]
-                        new_claims.append({
-                            'name': char.get('Name', 'Unknown'),
-                            'rarity': char.get('rarity', 'Unknown')
-                        })
 
-            # Trigger Paimon update for progress change
-            trigger_paimon_update('progress_updated', {
-                'user_id': user_id,
-                'display_name': user['display_name'],
-                'board_id': board_id,
-                'old_score': old_score,
-                'new_score': score,
-                'new_claims': new_claims,
-                'total_marked': len(marked_cells)
-            })
 
         return jsonify(progress)
     else:
@@ -642,6 +576,10 @@ def upload_square_image(user_id, board_id, square_index):
                 # Resize to max dimensions while maintaining aspect ratio
                 img.thumbnail(MAX_IMAGE_SIZE, Image.Resampling.LANCZOS)
                 img.save(filepath, optimize=True, quality=IMAGE_QUALITY)
+
+
+
+
 
             # Return the relative path for frontend use
             relative_path = f"/user-images/{user_id}/{board_id}/{filename}"

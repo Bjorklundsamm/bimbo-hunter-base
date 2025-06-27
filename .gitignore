@@ -37,9 +37,7 @@ venv.bak/
 .env
 .env.*
 !.env.example
-p(ai)mon/.env
-p(ai)mon/.env.*
-!p(ai)mon/.env.example
+
 
 # Node.js
 node_modules/
