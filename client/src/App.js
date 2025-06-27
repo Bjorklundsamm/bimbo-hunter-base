@@ -49,6 +49,7 @@ export const Rules = () => {
           <li>You can refresh to get a new board, but you will lose all your current progress. Please do not abuse this feature.</li>
           <li>You cannot be a member of more than one team.</li>
           <li>You may share a photo with someone who is not a member of your team, provided you are both featured in the photo.</li>
+          <li>DON'T CHEAT! Other players will be able to view your board. If you are caught intentionally uploading photos that do not include the person in the square your account will be deleted and you will be banned.</li>
         </ol>
         <p>Good luck, and happy hunting!</p>
       </div>

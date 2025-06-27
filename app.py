@@ -542,18 +542,32 @@ def admin_update_board_progress(user_id):
 
 # File Upload Endpoints
 
-@app.route('/api/users/<int:user_id>/boards/<int:board_id>/upload/<int:square_index>', methods=['POST'])
+@app.route('/api/users/<int:user_id>/boards/<int:board_id>/upload/<int:square_index>', methods=['POST', 'OPTIONS'])
 def upload_square_image(user_id, board_id, square_index):
     """Upload an image for a specific square"""
+    # Handle OPTIONS request for CORS
+    if request.method == 'OPTIONS':
+        return '', 200
+
+    logger.info(f"Upload request for user {user_id}, board {board_id}, square {square_index}")
+
     if 'file' not in request.files:
+        logger.warning("Upload failed: No file provided in request")
         return jsonify({'error': 'No file provided'}), 400
 
     file = request.files['file']
+    logger.info(f"File received: {file.filename}, size: {len(file.read())} bytes")
+    file.seek(0)  # Reset file pointer after reading size
 
     if file.filename == '':
+        logger.warning("Upload failed: No file selected (empty filename)")
         return jsonify({'error': 'No file selected'}), 400
 
-    if file and allowed_file(file.filename):
+    if not allowed_file(file.filename):
+        logger.warning(f"Upload failed: Invalid file type for {file.filename}")
+        return jsonify({'error': 'Invalid file type'}), 400
+
+    if file:
         # Create directory structure if it doesn't exist
         user_dir = os.path.join(app.config['UPLOAD_FOLDER'], str(user_id), str(board_id))
         os.makedirs(user_dir, exist_ok=True)
@@ -583,12 +597,14 @@ def upload_square_image(user_id, board_id, square_index):
 
             # Return the relative path for frontend use
             relative_path = f"/user-images/{user_id}/{board_id}/{filename}"
+            logger.info(f"Upload successful: {relative_path}")
             return jsonify({'success': True, 'image_path': relative_path})
 
         except Exception as e:
             logger.error(f"Error processing uploaded image: {e}")
             return jsonify({'error': 'Failed to process image'}), 500
 
+    logger.warning("Upload failed: File validation failed")
     return jsonify({'error': 'Invalid file type'}), 400
 
 

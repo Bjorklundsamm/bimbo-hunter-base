@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { getApiUrl } from '../../config/api';
 
 const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaimed, isReadOnly, userId, boardId, squareIndex, userImage }) => {
   // Get the portrait URL from the portrait path
@@ -65,7 +66,7 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
     formData.append('file', selectedFile);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/boards/${boardId}/upload/${squareIndex}`, {
+      const response = await fetch(getApiUrl(`/api/users/${userId}/boards/${boardId}/upload/${squareIndex}`), {
         method: 'POST',
         body: formData,
       });
@@ -78,8 +79,9 @@ const PortraitOverlay = ({ character, onClose, onClaim, sourcePosition, isClaime
         setShowDetails(false);
         setShowUpload(false);
       } else {
-        console.error('Upload failed');
-        alert('Failed to upload image. Please try again.');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Upload failed:', response.status, errorData);
+        alert(`Failed to upload image: ${errorData.error || 'Please try again.'}`);
       }
     } catch (error) {
       console.error('Upload error:', error);

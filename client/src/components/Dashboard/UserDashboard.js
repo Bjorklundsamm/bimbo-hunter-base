@@ -20,6 +20,7 @@ const UserDashboard = () => {
   const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showRules, setShowRules] = useState(false);
+  const [showRulesInAgreement, setShowRulesInAgreement] = useState(false);
 
   // Fetch all users and check if current user has a board on component mount
   useEffect(() => {
@@ -98,16 +99,18 @@ const UserDashboard = () => {
     setHasAgreedToTerms(false);
   };
 
-  // Handle showing How to Play content
+  // Handle showing How to Play content - navigate to How to Play page and close agreement modal
   const handleShowHowToPlay = (e) => {
     e.preventDefault();
-    setShowHowToPlay(true);
+    setShowAgreementModal(false);
+    setHasAgreedToTerms(false);
+    navigate('/how-to-play');
   };
 
-  // Handle showing Rules content
+  // Handle showing Rules content - show rules in agreement modal
   const handleShowRules = (e) => {
     e.preventDefault();
-    setShowRules(true);
+    setShowRulesInAgreement(true);
   };
 
   // Handle closing How to Play overlay
@@ -118,6 +121,11 @@ const UserDashboard = () => {
   // Handle closing Rules overlay
   const handleCloseRules = () => {
     setShowRules(false);
+  };
+
+  // Handle going back from rules to agreement
+  const handleBackToAgreement = () => {
+    setShowRulesInAgreement(false);
   };
 
   // Create a new board for the current user
@@ -269,7 +277,7 @@ const UserDashboard = () => {
       )}
 
       {/* Agreement modal */}
-      {showAgreementModal && (
+      {showAgreementModal && !showRulesInAgreement && (
         <div className="confirmation-overlay">
           <div className="agreement-modal">
             <h3>Before You Start Playing</h3>
@@ -299,6 +307,22 @@ const UserDashboard = () => {
               >
                 Start Playing!
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rules in Agreement modal */}
+      {showAgreementModal && showRulesInAgreement && (
+        <div className="confirmation-overlay">
+          <div className="content-modal">
+            <div className="content-modal-header">
+              <button onClick={handleBackToAgreement} className="back-to-agreement-button">← Back to User Agreement</button>
+              <h3>Rules</h3>
+              <button onClick={handleAgreementCancel} className="close-button">×</button>
+            </div>
+            <div className="content-modal-body">
+              <Rules />
             </div>
           </div>
         </div>

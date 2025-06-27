@@ -31,15 +31,15 @@ fi
 # Check if virtual environment is activated
 if [ -z "$VIRTUAL_ENV" ]; then
     echo "⚠️  Virtual environment not detected. Activating..."
-    # Check for Windows (Scripts) or Unix (bin) activation script
-    if [ -f "venv/Scripts/activate" ]; then
+    # Prioritize Unix paths for Linux/EC2 compatibility
+    if [ -f "venv/bin/activate" ]; then
+        source venv/bin/activate
+        echo "✅ Virtual environment activated (Unix/Linux)."
+    elif [ -f "venv/Scripts/activate" ]; then
         source venv/Scripts/activate
         echo "✅ Virtual environment activated (Windows)."
-    elif [ -f "venv/bin/activate" ]; then
-        source venv/bin/activate
-        echo "✅ Virtual environment activated (Unix)."
     else
-        echo "❌ Virtual environment not found. Please create one with: python -m venv venv"
+        echo "❌ Virtual environment not found. Please create one with: python3 -m venv venv"
         exit 1
     fi
     echo
@@ -59,7 +59,7 @@ fi
 
 # Initialize database
 echo "🗄️  Initializing database..."
-python -c "from database import init_db; init_db()" 2>/dev/null
+python3 -c "from database import init_db; init_db()" 2>/dev/null
 if [ $? -eq 0 ]; then
     echo "✅ Database initialized."
 else
@@ -70,7 +70,7 @@ echo
 
 # Start the backend server (production mode)
 echo "🖥️  Starting Python backend (production mode)..."
-python app.py &
+python3 app.py &
 BACKEND_PID=$!
 
 # Wait for backend to start
