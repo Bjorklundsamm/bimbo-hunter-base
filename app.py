@@ -2,7 +2,7 @@
 from flask import Flask, jsonify, send_from_directory, request, send_file
 import random
 import os
-from PIL import Image
+from PIL import Image, ImageOps
 import characters
 import tools
 from models import User, Board, Progress
@@ -583,6 +583,10 @@ def upload_square_image(user_id, board_id, square_index):
 
             # Resize image for optimal performance
             with Image.open(filepath) as img:
+                # Handle EXIF orientation data to fix mobile upload rotation issues
+                # This automatically rotates the image based on EXIF orientation data
+                img = ImageOps.exif_transpose(img)
+
                 # Convert to RGB if necessary (for JPEG compatibility)
                 if img.mode in ('RGBA', 'LA', 'P'):
                     img = img.convert('RGB')
@@ -628,6 +632,11 @@ def serve_thumbnails(path):
 @app.route('/Portraits/<path:path>')
 def serve_portraits(path):
     """Serve portrait images from build"""
+    return send_from_directory('client/build/Portraits', path)
+
+@app.route('/portraits/<path:path>')
+def serve_portraits_lowercase(path):
+    """Serve portrait images from build (lowercase route for compatibility)"""
     return send_from_directory('client/build/Portraits', path)
 
 @app.route('/frames/<path:path>')
