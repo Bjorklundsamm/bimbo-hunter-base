@@ -532,7 +532,7 @@ characters = [
         "Source": "KPOP Demon Slayers",
         "Portrait": "/portraits/UR+ - Huntrix - KPOP Demon Slayers - portrait.png",
         "Thumbnail": "/thumbnails/Huntrix.png",
-        "description": "Black hair, black suit, black gloves, black boots, black mask",
+        "description": "Three girls, pink hair, purple hair, black hair, kpop outfits",
         "conditions": "Trio - All three characters must be in the photo",
     },
     {
