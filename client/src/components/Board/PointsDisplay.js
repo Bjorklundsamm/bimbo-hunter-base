@@ -120,8 +120,7 @@ const PointsDisplay = ({ characters, markedCells, onRefreshClick, isReadOnly, sc
 
   // Milestone definitions - updated as per requirements
   const milestones = [
-    { points: 150, reward: "Champagne Toast!" },
-    { points: 250, reward: "Mystery Prize" },
+    { points: 250, reward: "Champagne Toast!" },
     { points: 350, reward: "Seafood Boil" }
   ];
 
