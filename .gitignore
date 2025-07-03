@@ -143,7 +143,7 @@ dist
 
 # Gatsby files
 .cache/
-public
+# public - commented out to allow portraits and thumbnails
 
 # Storybook build outputs
 .out
