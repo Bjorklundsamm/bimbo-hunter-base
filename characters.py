@@ -428,8 +428,8 @@ characters = [
     {
         "rarity": "SSR",
         "Name": "Elias Ainsworth",
-        "Source": "Ancient Magus' Bride",
-        "Portrait": "/portraits/SSR - Elias Ainsworth - Ancient Magus Bride - portrait.png",
+        "Source": "Ancient Magus Bride",
+        "Portrait": "/portraits/SSR - Elias Ainzworth - Ancient Magus Bride - portrait.png",
         "Thumbnail": "/thumbnails/Elias Ainsworth.png",
         "description": "Skull helmet, robes, cane",
         "conditions": "None",
